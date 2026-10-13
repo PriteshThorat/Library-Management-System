@@ -1,10 +1,15 @@
 package src.frames;
 
 import javax.swing.*;
+
+import src.service.BooksService;
+import src.service.IssueRecordsService;
+import src.service.MembersService;
+
 import java.awt.*;
 
 public class DashboardFrame {
-    public DashboardFrame () {
+    public DashboardFrame () throws Exception {
         JFrame frame = new JFrame("Library Management System - Dashboard");
         frame.setSize(900, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,9 +55,9 @@ public class DashboardFrame {
         JPanel cards = new JPanel(new GridLayout(1, 3, 15, 15));
         cards.setOpaque(false);
 
-        cards.add(createCard("Total Books", "0"));
-        cards.add(createCard("Total Members", "0"));
-        cards.add(createCard("Books Issued", "0"));
+        cards.add(createCard("Total Books", Integer.toString(BooksService.getAllBooksCount())));
+        cards.add(createCard("Total Members", Integer.toString(MembersService.getAllMembersCount())));
+        cards.add(createCard("Books Issued", Integer.toString(IssueRecordsService.getAllIssueRecordsCount())));
 
         JPanel centerPanel = new JPanel(new BorderLayout(10, 25));
         centerPanel.setOpaque(false);

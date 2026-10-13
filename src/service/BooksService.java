@@ -6,7 +6,7 @@ import java.util.Scanner;
 import src.config.EnvConfig;
 
 public class BooksService {
-  public int getAllBooksCount () throws Exception {
+  public static int getAllBooksCount () throws Exception {
     File file = new File(EnvConfig.getBooksFilename());
 
     Scanner booksData = new Scanner(file);
