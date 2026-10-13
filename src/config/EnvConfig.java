@@ -21,4 +21,16 @@ public class EnvConfig {
   public static String getPassword () throws Exception {
     return helper("DB_PASSWORD");
   }
+
+  public  static String getBooksFilename () throws Exception {
+    return helper("DB_BOOKS_FILENAME");
+  }
+
+  public  static String getMembersFilename () throws Exception {
+    return helper("DB_MEMBERS_FILENAME");
+  }
+
+  public  static String getIssueRecordsFilename () throws Exception {
+    return helper("DB_ISSUE_RECORDS_FILENAME");
+  }
 }
