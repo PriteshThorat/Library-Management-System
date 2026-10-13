@@ -142,7 +142,7 @@ public class LoginFrame {
             }
 
             if (username.equals(EnvConfig.getUsername()) && password.equals(EnvConfig.getPassword())) {
-                JOptionPane.showMessageDialog(frame, "Login Successful!");
+                frame.dispose();
                 
                 new DashboardFrame();
             } else {
