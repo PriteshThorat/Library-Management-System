@@ -1,7 +1,7 @@
 # Library-Management-System
 
 javac -cp "lib/*" -d bin src/Main.java
-javac -cp "lib/*" -d bin src\Main.java src\config\EnvConfig.java src\frames\LoginFrame.java
+javac -d bin src\Main.java src\config\EnvConfig.java src\frames\LoginFrame.java src\frames\DashboardFrame.java src\config\FileCreation.java src\service\BooksService.java
 
 java -cp "lib/*;bin" Main
 
