@@ -58,10 +58,13 @@ public class DashboardFrame {
 
         dashboardButton.addActionListener(e -> {
             setActive(dashboardButton);
-            //JOptionPane.showMessageDialog(frame, "You are on the Dashboard.");
         });
         booksButton.addActionListener(e -> {
             setActive(booksButton);
+
+            new BookFrame();
+
+            //frame.dispose();
             //JOptionPane.showMessageDialog(frame, "Manage Books selected.");
         });
         membersButton.addActionListener(e -> {

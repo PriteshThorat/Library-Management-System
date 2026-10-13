@@ -2,12 +2,15 @@ package src.frames;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import src.service.BooksService;
+
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookFrame extends JFrame {
+public class BookFrame {
   private JTextField bookIdField;
   private JTextField titleField;
   private JTextField authorField;
@@ -18,26 +21,25 @@ public class BookFrame extends JFrame {
   private JTable bookTable;
   private DefaultTableModel tableModel;
 
-  private final String FILE_PATH = "books.csv";
+  public BookFrame () throws Exception {
+      JFrame frame = new JFrame("Manage Books");
+      frame.setTitle("Library Management System - Books");
+      frame.setSize(900, 600);
+      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+      frame.setLocationRelativeTo(null);
 
-  public BookFrame() {
-      setTitle("Library Management System - Books");
-      setSize(900, 600);
-      setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-      setLocationRelativeTo(null);
-
-      initializeUI();
-      loadBooks();
+      initializeUI(frame);
+      loadBooks(frame);
   }
 
-  private void initializeUI() {
-      setLayout(new BorderLayout(10, 10));
+  private void initializeUI(JFrame frame) throws Exception {
+      frame.setLayout(new BorderLayout(10, 10));
 
       JLabel heading = new JLabel("Book Management", SwingConstants.CENTER);
       heading.setFont(new Font("Arial", Font.BOLD, 25));
       heading.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
 
-      add(heading, BorderLayout.NORTH);
+      frame.add(heading, BorderLayout.NORTH);
 
       JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
       mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
@@ -94,14 +96,14 @@ public class BookFrame extends JFrame {
       searchPanel.add(showAllButton);
 
       String[] columns = {
-          "Book ID", "Title", "Author", "ISBN", "Quantity"
+        "Book ID", "Title", "Author", "ISBN", "Quantity"
       };
 
       tableModel = new DefaultTableModel(columns, 0) {
-          @Override
-          public boolean isCellEditable(int row, int column) {
-              return false;
-          }
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return false;
+        }
       };
 
       bookTable = new JTable(tableModel);
@@ -118,14 +120,18 @@ public class BookFrame extends JFrame {
       mainPanel.add(leftPanel, BorderLayout.NORTH);
       mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-      add(mainPanel, BorderLayout.CENTER);
+      frame.add(mainPanel, BorderLayout.CENTER);
 
-      addButton.addActionListener(e -> addBook());
-      updateButton.addActionListener(e -> updateBook());
-      deleteButton.addActionListener(e -> deleteBook());
-      clearButton.addActionListener(e -> clearFields());
-      searchButton.addActionListener(e -> searchBooks());
-      showAllButton.addActionListener(e -> loadBooks());
+      try {
+        addButton.addActionListener(e -> addBook(frame));
+        updateButton.addActionListener(e -> updateBook(frame));
+        deleteButton.addActionListener(e -> deleteBook(frame));
+        clearButton.addActionListener(e -> clearFields(frame));
+        searchButton.addActionListener(e -> searchBooks(frame));
+        showAllButton.addActionListener(e -> loadBooks(frame));
+      } catch (Exception e) {
+        System.out.println(e);
+      }
 
       bookTable.getSelectionModel().addListSelectionListener(e -> {
           if (!e.getValueIsAdjusting()) {
@@ -134,20 +140,17 @@ public class BookFrame extends JFrame {
       });
   }
 
-  private void addBook() {
-      String bookId = bookIdField.getText().trim();
-      String title = titleField.getText().trim();
-      String author = authorField.getText().trim();
-      String isbn = isbnField.getText().trim();
-      String quantityText = quantityField.getText().trim();
+  private void addBook(JFrame frame) throws Exception {
+    String bookId = bookIdField.getText().trim();
+    String title = titleField.getText().trim();
+    String author = authorField.getText().trim();
+    String isbn = isbnField.getText().trim();
+    String quantityText = quantityField.getText().trim();
 
-      if (bookId.isEmpty() || title.isEmpty()
-              || author.isEmpty() || isbn.isEmpty()
-              || quantityText.isEmpty()) {
-          JOptionPane.showMessageDialog(this,
-                  "Please fill in all fields.");
-          return;
-      }
+    if (bookId.isEmpty() || title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantityText.isEmpty()) {
+      JOptionPane.showMessageDialog(frame, "Please fill in all fields.");
+      return;
+    }
 
       int quantity;
 
@@ -155,21 +158,20 @@ public class BookFrame extends JFrame {
           quantity = Integer.parseInt(quantityText);
 
           if (quantity < 0) {
-              JOptionPane.showMessageDialog(this,
-                      "Quantity cannot be negative.");
+              JOptionPane.showMessageDialog(frame,  "Quantity cannot be negative.");
               return;
           }
       } catch (NumberFormatException ex) {
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Quantity must be a valid integer.");
           return;
       }
 
-      List<String[]> books = readBooks();
+      List<String[]> books = BooksService.readBooks();
 
       for (String[] book : books) {
           if (book[0].equalsIgnoreCase(bookId)) {
-              JOptionPane.showMessageDialog(this,
+              JOptionPane.showMessageDialog(frame,
                       "Book ID already exists.");
               return;
           }
@@ -179,20 +181,19 @@ public class BookFrame extends JFrame {
           bookId, title, author, isbn, String.valueOf(quantity)
       });
 
-      if (writeBooks(books)) {
-          loadBooks();
-          clearFields();
+      if (BooksService.writeBooks(books)) {
+        loadBooks(frame);
+        clearFields(frame);
 
-          JOptionPane.showMessageDialog(this,
-                  "Book added successfully.");
+        JOptionPane.showMessageDialog(frame,  "Book added successfully.");
       }
   }
 
-  private void updateBook() {
+  private void updateBook(JFrame frame) throws Exception {
       int selectedRow = bookTable.getSelectedRow();
 
       if (selectedRow == -1) {
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Please select a book to update.");
           return;
       }
@@ -206,7 +207,7 @@ public class BookFrame extends JFrame {
       if (bookId.isEmpty() || title.isEmpty()
               || author.isEmpty() || isbn.isEmpty()
               || quantityText.isEmpty()) {
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Please fill in all fields.");
           return;
       }
@@ -217,12 +218,12 @@ public class BookFrame extends JFrame {
           quantity = Integer.parseInt(quantityText);
 
           if (quantity < 0) {
-              JOptionPane.showMessageDialog(this,
+              JOptionPane.showMessageDialog(frame,
                       "Quantity cannot be negative.");
               return;
           }
       } catch (NumberFormatException ex) {
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Quantity must be a valid integer.");
           return;
       }
@@ -230,12 +231,12 @@ public class BookFrame extends JFrame {
       String originalBookId = tableModel.getValueAt(
               selectedRow, 0).toString();
 
-      List<String[]> books = readBooks();
+      List<String[]> books = BooksService.readBooks();
 
       for (String[] book : books) {
           if (!book[0].equalsIgnoreCase(originalBookId)
                   && book[0].equalsIgnoreCase(bookId)) {
-              JOptionPane.showMessageDialog(this,
+              JOptionPane.showMessageDialog(frame,
                       "Another book already uses this Book ID.");
               return;
           }
@@ -255,20 +256,19 @@ public class BookFrame extends JFrame {
           }
       }
 
-      if (updated && writeBooks(books)) {
-          loadBooks();
-          clearFields();
+      if (updated && BooksService.writeBooks(books)) {
+        loadBooks(frame);
+        clearFields(frame);
 
-          JOptionPane.showMessageDialog(this,
-                  "Book updated successfully.");
+        JOptionPane.showMessageDialog(frame,  "Book updated successfully.");
       }
   }
 
-  private void deleteBook() {
+  private void deleteBook(JFrame frame) throws Exception {
       int selectedRow = bookTable.getSelectedRow();
 
       if (selectedRow == -1) {
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Please select a book to delete.");
           return;
       }
@@ -276,7 +276,7 @@ public class BookFrame extends JFrame {
       String bookId = tableModel.getValueAt(
               selectedRow, 0).toString();
 
-      int choice = JOptionPane.showConfirmDialog(this,
+      int choice = JOptionPane.showConfirmDialog(frame,
               "Delete book " + bookId + "?",
               "Confirm Delete",
               JOptionPane.YES_NO_OPTION);
@@ -285,24 +285,24 @@ public class BookFrame extends JFrame {
           return;
       }
 
-      List<String[]> books = readBooks();
+      List<String[]> books = BooksService.readBooks();
       books.removeIf(book -> book[0].equalsIgnoreCase(bookId));
 
-      if (writeBooks(books)) {
-          loadBooks();
-          clearFields();
+      if (writeBooks(books, frame)) {
+          loadBooks(frame);
+          clearFields(frame);
 
-          JOptionPane.showMessageDialog(this,
+          JOptionPane.showMessageDialog(frame,
                   "Book deleted successfully.");
       }
   }
 
-  private void searchBooks() {
+  private void searchBooks(JFrame frame) throws Exception {
       String keyword = searchField.getText().trim().toLowerCase();
 
       tableModel.setRowCount(0);
 
-      for (String[] book : readBooks()) {
+      for (String[] book : BooksService.readBooks()) {
           boolean matches = false;
 
           for (String value : book) {
@@ -319,89 +319,33 @@ public class BookFrame extends JFrame {
   }
 
   private void fillFieldsFromTable() {
-      int selectedRow = bookTable.getSelectedRow();
+    int selectedRow = bookTable.getSelectedRow();
 
-      if (selectedRow == -1) {
-          return;
-      }
+    if (selectedRow == -1) {
+        return;
+    }
 
-      bookIdField.setText(
-              tableModel.getValueAt(selectedRow, 0).toString());
-      titleField.setText(
-              tableModel.getValueAt(selectedRow, 1).toString());
-      authorField.setText(
-              tableModel.getValueAt(selectedRow, 2).toString());
-      isbnField.setText(
-              tableModel.getValueAt(selectedRow, 3).toString());
-      quantityField.setText(
-              tableModel.getValueAt(selectedRow, 4).toString());
+    bookIdField.setText(tableModel.getValueAt(selectedRow, 0).toString());
+    titleField.setText(tableModel.getValueAt(selectedRow, 1).toString());
+    authorField.setText(tableModel.getValueAt(selectedRow, 2).toString());
+    isbnField.setText(tableModel.getValueAt(selectedRow, 3).toString());
+    quantityField.setText(tableModel.getValueAt(selectedRow, 4).toString());
   }
 
-  private void clearFields() {
-      bookIdField.setText("");
-      titleField.setText("");
-      authorField.setText("");
-      isbnField.setText("");
-      quantityField.setText("");
-      bookTable.clearSelection();
+  private void clearFields(JFrame frame) {
+    bookIdField.setText("");
+    titleField.setText("");
+    authorField.setText("");
+    isbnField.setText("");
+    quantityField.setText("");
+    bookTable.clearSelection();
   }
 
-  private void loadBooks() {
-      tableModel.setRowCount(0);
+  private void loadBooks(JFrame frame) {
+    tableModel.setRowCount(0);
 
-      for (String[] book : readBooks()) {
-          tableModel.addRow(book);
-      }
-  }
-
-  private List<String[]> readBooks() {
-      List<String[]> books = new ArrayList<>();
-      File file = new File(FILE_PATH);
-
-      if (!file.exists()) {
-          return books;
-      }
-
-      try (BufferedReader reader = new BufferedReader(
-              new FileReader(file))) {
-
-          String line = reader.readLine();
-
-          if (line == null) {
-              return books;
-          }
-
-          while ((line = reader.readLine()) != null) {
-              String[] data = line.split(",", -1);
-
-              if (data.length == 5) {
-                  books.add(data);
-              }
-          }
-
-      } catch (IOException ex) {
-          JOptionPane.showMessageDialog(this,
-                  "Error reading books.csv: " + ex.getMessage());
-      }
-
-      return books;
-  }
-
-  private boolean writeBooks(List<String[]> books) {
-      try (PrintWriter writer = new PrintWriter(
-              new FileWriter(FILE_PATH))) {
-
-          writer.println("Book ID,Title,Author,isbn,quantity");
-
-          for (String[] book : books) {
-              writer.println(String.join(",", book));
-          }
-
-          return true;
-
-      } catch (IOException ex) {
-        JOptionPane.showMessageDialog(this, "Error saving books.csv: " + ex.getMessage());
-        return false;
-      }
+    for (String[] book : BooksService.readBooks();) {
+      tableModel.addRow(book);
+    }
   }
 }
