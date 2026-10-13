@@ -43,7 +43,7 @@ public class IssueRecordsService {
     while (overdueRecordsData.hasNextLine()) {
       if (!skip) {
         String line = overdueRecordsData.nextLine();
-        String structuredData[] = line.split(",", -1);
+        String structuredData[] = line.split(",");
 
         if (structuredData[5].equals("Not_Returned")) {
           LocalDate dueDate = LocalDate.parse(structuredData[4]);

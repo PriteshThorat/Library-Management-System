@@ -23,6 +23,7 @@ public class DashboardFrame {
     private static final Color ACCENT_BLUE = new Color(26, 115, 232);
     private static final Color ACCENT_GREEN = new Color(52, 168, 83);
     private static final Color ACCENT_ORANGE = new Color(245, 124, 0);
+    private static final Color ACCENT_RED = new Color(220, 53, 69);
 
     private final JFrame frame;
     private final NavButton dashboardButton;
@@ -41,8 +42,8 @@ public class DashboardFrame {
         booksButton = new NavButton("Books", new AppIcon(20, AppIcon.Type.BOOKS));
         membersButton = new NavButton("Members", new AppIcon(20, AppIcon.Type.MEMBERS));
         issueButton = new NavButton("Issue / Return", new AppIcon(20, AppIcon.Type.ISSUE));
-        usersButton = new NavButton("Users", new AppIcon(20, AppIcon.Type.ISSUE));
-        logoutButton = new NavButton("Logout", new AppIcon(20, AppIcon.Type.ISSUE));
+        usersButton = new NavButton("Users", new AppIcon(20, AppIcon.Type.USER));
+        logoutButton = new NavButton("Logout", new AppIcon(20, AppIcon.Type.LOGOUT));
         NavButton exitButton = new NavButton("Exit", new AppIcon(20, AppIcon.Type.EXIT));
         dashboardButton.setActive(true);
 
@@ -82,7 +83,7 @@ public class DashboardFrame {
     }
 
     private void setActive(NavButton selected) {
-        for (NavButton button : new NavButton[] { dashboardButton, booksButton, membersButton, issueButton }) {
+        for (NavButton button : new NavButton[] { dashboardButton, booksButton, membersButton, issueButton, usersButton, logoutButton }) {
             button.setActive(button == selected);
         }
     }
@@ -111,11 +112,6 @@ public class DashboardFrame {
         logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         logoutButton.setPreferredSize(new Dimension(110, 38));
 
-        JPanel logoutBox = new JPanel(new GridBagLayout());
-        logoutBox.setOpaque(false);
-        logoutBox.add(logoutButton);
-        header.add(logoutBox, BorderLayout.EAST);
-
         return header;
     }
 
@@ -142,8 +138,10 @@ public class DashboardFrame {
         sidebar.add(membersButton);
         sidebar.add(Box.createVerticalStrut(6));
         sidebar.add(issueButton);
-        sidebar.add(Box.createVerticalGlue());
-        sidebar.add(exitButton);
+        sidebar.add(Box.createVerticalStrut(6));
+        sidebar.add(usersButton);
+        sidebar.add(Box.createVerticalStrut(6));
+        sidebar.add(logoutButton);
 
         return sidebar;
     }
@@ -153,23 +151,12 @@ public class DashboardFrame {
         content.setBackground(CONTENT_BG);
         content.setBorder(new EmptyBorder(30, 34, 30, 34));
 
-        JPanel heading = new JPanel();
-        heading.setLayout(new BoxLayout(heading, BoxLayout.Y_AXIS));
-        heading.setOpaque(false);
-        heading.setAlignmentX(Component.LEFT_ALIGNMENT);
-
         JLabel welcome = new JLabel("Welcome, Admin");
         welcome.setFont(new Font("Arial", Font.BOLD, 26));
         welcome.setForeground(TEXT);
-        welcome.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        heading.add(welcome);
-        heading.add(Box.createVerticalStrut(6));
-
-        JPanel cards = new JPanel(new GridLayout(1, 3, 20, 20));
+        JPanel cards = new JPanel(new GridLayout(2, 2, 22, 22));
         cards.setOpaque(false);
-        cards.setAlignmentX(Component.LEFT_ALIGNMENT);
-        cards.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
         cards.add(createStatCard("Total Books", Integer.toString(BooksService.getAllBooksCount()),
             AppIcon.Type.BOOKS, ACCENT_BLUE));
         cards.add(createStatCard("Total Members", Integer.toString(MembersService.getAllMembersCount()),
@@ -177,49 +164,57 @@ public class DashboardFrame {
         cards.add(createStatCard("Issued Books", Integer.toString(IssueRecordsService.getAllIssueRecordsCount()),
             AppIcon.Type.ISSUE, ACCENT_ORANGE));
         cards.add(createStatCard("Overdue Books", Integer.toString(IssueRecordsService.getAllOverdueRecordsCount()),
-            AppIcon.Type.ISSUE, ACCENT_ORANGE)); 
+            AppIcon.Type.OVERDUE, ACCENT_RED));
 
-        JPanel column = new JPanel();
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-        column.setOpaque(false);
-        column.add(heading);
-        column.add(Box.createVerticalStrut(28));
-        column.add(cards);
-        column.add(Box.createVerticalGlue());
+        JPanel centerWrap = new JPanel(new GridBagLayout());
+        centerWrap.setOpaque(false);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(24, 0, 0, 0);
+        centerWrap.add(cards, c);
 
-        content.add(column, BorderLayout.CENTER);
+        content.add(welcome, BorderLayout.NORTH);
+        content.add(centerWrap, BorderLayout.CENTER);
 
         return content;
     }
 
     private JPanel createStatCard(String heading, String value, AppIcon.Type iconType, Color accent) {
-        RoundedPanel card = new RoundedPanel(14, Color.WHITE, BORDER);
-        card.setLayout(new BorderLayout(18, 0));
-        card.setBorder(new EmptyBorder(20, 22, 20, 22));
+        RoundedPanel card = new RoundedPanel(18, Color.WHITE, BORDER);
+        card.setLayout(new BorderLayout(24, 0));
+        card.setBorder(new EmptyBorder(28, 32, 28, 32));
 
-        RoundedPanel badge = new RoundedPanel(14, accent, null);
-        badge.setPreferredSize(new Dimension(60, 60));
+        RoundedPanel badge = new RoundedPanel(18, accent, null);
+        badge.setPreferredSize(new Dimension(84, 84));
         badge.setLayout(new GridBagLayout());
-        badge.add(new JLabel(new AppIcon(30, Color.WHITE, iconType)));
-        card.add(badge, BorderLayout.WEST);
+        badge.add(new JLabel(new AppIcon(42, Color.WHITE, iconType)));
+
+        JPanel badgeWrap = new JPanel(new GridBagLayout());
+        badgeWrap.setOpaque(false);
+        badgeWrap.add(badge);
+        card.add(badgeWrap, BorderLayout.WEST);
 
         JPanel textBox = new JPanel();
         textBox.setOpaque(false);
         textBox.setLayout(new BoxLayout(textBox, BoxLayout.Y_AXIS));
 
         JLabel headingLabel = new JLabel(heading);
-        headingLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        headingLabel.setFont(new Font("Arial", Font.PLAIN, 18));
         headingLabel.setForeground(MUTED);
         headingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 32));
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 44));
         valueLabel.setForeground(TEXT);
         valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         textBox.add(Box.createVerticalGlue());
         textBox.add(headingLabel);
-        textBox.add(Box.createVerticalStrut(4));
+        textBox.add(Box.createVerticalStrut(6));
         textBox.add(valueLabel);
         textBox.add(Box.createVerticalGlue());
 
@@ -296,7 +291,7 @@ public class DashboardFrame {
     }
 
     private static class AppIcon implements Icon {
-        enum Type { BOOKS, MEMBERS, ISSUE, DASHBOARD, EXIT }
+        enum Type { BOOKS, MEMBERS, USER, ISSUE, OVERDUE, DASHBOARD, EXIT, LOGOUT }
 
         private final int size;
         private final Color color;
@@ -351,6 +346,12 @@ public class DashboardFrame {
                     g2.fillRoundRect((int) (s * 0.12), (int) (s * 0.54), (int) (s * 0.42), (int) (s * 0.28), 12, 12);
                     break;
                 }
+                case USER: {
+                    g2.fillOval((int) (s * 0.32), (int) (s * 0.18), (int) (s * 0.36), (int) (s * 0.36));
+                    g2.fillRoundRect((int) (s * 0.2), (int) (s * 0.58), (int) (s * 0.6), (int) (s * 0.3),
+                        (int) (s * 0.15), (int) (s * 0.15));
+                    break;
+                }
                 case ISSUE: {
                     g2.drawRoundRect((int) (s * 0.16), (int) (s * 0.18), (int) (s * 0.44), (int) (s * 0.64), 4, 4);
                     Path2D arrow = new Path2D.Float();
@@ -360,6 +361,17 @@ public class DashboardFrame {
                     arrow.lineTo(s * 0.86, s * 0.36);
                     arrow.lineTo(s * 0.86, s * 0.6);
                     g2.draw(arrow);
+                    break;
+                }
+                case OVERDUE: {
+                    Path2D warning = new Path2D.Float();
+                    warning.moveTo(s * 0.5, s * 0.14);
+                    warning.lineTo(s * 0.9, s * 0.84);
+                    warning.lineTo(s * 0.1, s * 0.84);
+                    warning.closePath();
+                    g2.draw(warning);
+                    g2.drawLine((int) (s * 0.5), (int) (s * 0.42), (int) (s * 0.5), (int) (s * 0.62));
+                    g2.fillOval((int) (s * 0.45), (int) (s * 0.69), (int) (s * 0.1), (int) (s * 0.1));
                     break;
                 }
                 case DASHBOARD: {
@@ -381,6 +393,21 @@ public class DashboardFrame {
                     arrow.lineTo(s * 0.86, s * 0.5);
                     arrow.lineTo(s * 0.7, s * 0.66);
                     g2.draw(arrow);
+                    break;
+                }
+                case LOGOUT: {
+                    Path2D door = new Path2D.Float();
+                    door.moveTo(s * 0.48, s * 0.16);
+                    door.lineTo(s * 0.16, s * 0.16);
+                    door.lineTo(s * 0.16, s * 0.84);
+                    door.lineTo(s * 0.48, s * 0.84);
+                    g2.draw(door);
+                    g2.drawLine((int) (s * 0.42), (int) (s * 0.5), (int) (s * 0.86), (int) (s * 0.5));
+                    Path2D head = new Path2D.Float();
+                    head.moveTo(s * 0.68, s * 0.34);
+                    head.lineTo(s * 0.86, s * 0.5);
+                    head.lineTo(s * 0.68, s * 0.66);
+                    g2.draw(head);
                     break;
                 }
             }
