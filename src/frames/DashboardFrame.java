@@ -30,7 +30,6 @@ public class DashboardFrame {
     private final NavButton booksButton;
     private final NavButton membersButton;
     private final NavButton issueButton;
-    private final NavButton usersButton;
     private final NavButton logoutButton;
 
     public DashboardFrame() throws Exception {
@@ -42,7 +41,6 @@ public class DashboardFrame {
         booksButton = new NavButton("Books", new AppIcon(20, AppIcon.Type.BOOKS));
         membersButton = new NavButton("Members", new AppIcon(20, AppIcon.Type.MEMBERS));
         issueButton = new NavButton("Issue / Return", new AppIcon(20, AppIcon.Type.ISSUE));
-        usersButton = new NavButton("Users", new AppIcon(20, AppIcon.Type.USER));
         logoutButton = new NavButton("Logout", new AppIcon(20, AppIcon.Type.LOGOUT));
         NavButton exitButton = new NavButton("Exit", new AppIcon(20, AppIcon.Type.EXIT));
         dashboardButton.setActive(true);
@@ -79,10 +77,6 @@ public class DashboardFrame {
             new IssueReturnFrame();
             //JOptionPane.showMessageDialog(frame, "Issue / Return Books selected.");
         });
-        usersButton.addActionListener(e -> {
-            setActive(usersButton);
-            //
-        });
         exitButton.addActionListener(e -> frame.dispose());
 
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -90,7 +84,7 @@ public class DashboardFrame {
     }
 
     private void setActive(NavButton selected) {
-        for (NavButton button : new NavButton[] { dashboardButton, booksButton, membersButton, issueButton, usersButton, logoutButton }) {
+        for (NavButton button : new NavButton[] { dashboardButton, booksButton, membersButton, issueButton, logoutButton }) {
             button.setActive(button == selected);
         }
     }
@@ -146,7 +140,6 @@ public class DashboardFrame {
         sidebar.add(Box.createVerticalStrut(6));
         sidebar.add(issueButton);
         sidebar.add(Box.createVerticalStrut(6));
-        sidebar.add(usersButton);
         sidebar.add(Box.createVerticalStrut(6));
         sidebar.add(logoutButton);
 
