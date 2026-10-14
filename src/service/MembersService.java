@@ -75,7 +75,7 @@ public class MembersService {
   }
 
   public static boolean updateMember (String memberId, String name, String email, String phone) throws Exception {
-    File file = new File(EnvConfig.getBooksFilename());
+    File file = new File(EnvConfig.getMembersFilename());
 
     Scanner memberData = new Scanner(file);
     String updatedMemberData = "";
@@ -107,5 +107,64 @@ public class MembersService {
     fileWriter.close();
 
     return true;
+  }
+
+  public static boolean deleteMember (String memberId) throws Exception {
+    File file = new File(EnvConfig.getMembersFilename());
+
+    Scanner memberData = new Scanner(file);
+    String updatedMemberData = "";
+
+    while (memberData.hasNextLine()) {
+      String line = memberData.nextLine();
+
+      if (!line.contains(memberId)) {
+        updatedMemberData += line;
+        updatedMemberData += "\n";
+      }
+    }
+    
+    FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename());
+    
+    fileWriter.write(updatedMemberData);
+
+    memberData.close();
+    fileWriter.close();
+
+    return true;
+  }
+
+  public static String[] searchMember (String keyword) {
+    try {
+      File file = new File(EnvConfig.getBooksFilename());
+      FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
+
+      Scanner memberData = new Scanner(file);
+      String member[] = {""};
+
+      while (memberData.hasNextLine()) {
+        String line = memberData.nextLine();
+
+        if (line.toLowerCase().contains(keyword)) {
+          member = line.split(",");
+            
+          memberData.close();
+          fileWriter.close();
+          
+          return member;
+        }
+      }
+
+      fileWriter.close();
+      memberData.close();
+
+      return member;
+    } catch (Exception e) {
+      String member[] = {""};
+
+      System.out.println(e);
+
+      return member;
+    }
   }
 }

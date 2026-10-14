@@ -6,8 +6,6 @@ import javax.swing.table.DefaultTableModel;
 import src.service.MembersService;
 
 import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MemberFrame extends JFrame {
@@ -20,8 +18,6 @@ public class MemberFrame extends JFrame {
     private JTable memberTable;
     private DefaultTableModel tableModel;
 
-    private final String FILE_PATH = "members.csv";
-
     public MemberFrame() {
         setTitle("Library Management System - Members");
         setSize(850, 550);
@@ -30,6 +26,9 @@ public class MemberFrame extends JFrame {
 
         initializeUI();
         loadMembers();
+
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setVisible(true);
     }
 
     private void initializeUI() {
@@ -237,136 +236,72 @@ public class MemberFrame extends JFrame {
         int selectedRow = memberTable.getSelectedRow();
 
         if (selectedRow == -1) {
-            JOptionPane.showMessageDialog(this,
-                    "Please select a member to delete.");
-            return;
+          JOptionPane.showMessageDialog(this,  "Please select a member to delete.");
+          
+          return;
         }
 
-        String memberId = tableModel.getValueAt(
-                selectedRow, 0).toString();
+        String memberId = tableModel.getValueAt(selectedRow, 0).toString();
 
-        int choice = JOptionPane.showConfirmDialog(this,
-                "Delete member " + memberId + "?",
-                "Confirm Delete",
-                JOptionPane.YES_NO_OPTION);
+        int choice = JOptionPane.showConfirmDialog(this, "Delete member " + memberId + "?",  "Confirm Delete",  JOptionPane.YES_NO_OPTION);
 
         if (choice != JOptionPane.YES_OPTION) {
-            return;
+          return;
         }
 
-        List<String[]> members = readMembers();
-
-        members.removeIf(
-                member -> member[0].equalsIgnoreCase(memberId));
-
-        if (writeMembers(members)) {
+        try {
+          if (MembersService.deleteMember(memberId)) {
             loadMembers();
             clearFields();
 
-            JOptionPane.showMessageDialog(this,
-                    "Member deleted successfully.");
+            JOptionPane.showMessageDialog(this,  "Member deleted successfully.");
+          }
+        } catch (Exception e) {
+          System.out.println(e);
         }
     }
 
     private void searchMembers() {
-        String keyword = searchField.getText()
-                .trim().toLowerCase();
+      String keyword = searchField.getText().trim().toLowerCase();
 
-        tableModel.setRowCount(0);
+      tableModel.setRowCount(0);
 
-        for (String[] member : readMembers()) {
-            for (String value : member) {
-                if (value.toLowerCase().contains(keyword)) {
-                    tableModel.addRow(member);
-                    break;
-                }
-            }
-        }
+      String[] member = MembersService.searchMember(keyword);
+
+      tableModel.addRow(member);
     }
 
     private void fillFieldsFromTable() {
-        int selectedRow = memberTable.getSelectedRow();
+      int selectedRow = memberTable.getSelectedRow();
 
-        if (selectedRow == -1) {
-            return;
-        }
+      if (selectedRow == -1) {
+          return;
+      }
 
-        memberIdField.setText(
-                tableModel.getValueAt(selectedRow, 0).toString());
-        nameField.setText(
-                tableModel.getValueAt(selectedRow, 1).toString());
-        emailField.setText(
-                tableModel.getValueAt(selectedRow, 2).toString());
-        phoneField.setText(
-                tableModel.getValueAt(selectedRow, 3).toString());
+      memberIdField.setText(tableModel.getValueAt(selectedRow, 0).toString());
+      nameField.setText(tableModel.getValueAt(selectedRow, 1).toString());
+      emailField.setText(tableModel.getValueAt(selectedRow, 2).toString());
+      phoneField.setText(tableModel.getValueAt(selectedRow, 3).toString());
     }
 
     private void clearFields() {
-        memberIdField.setText("");
-        nameField.setText("");
-        emailField.setText("");
-        phoneField.setText("");
-        searchField.setText("");
-        memberTable.clearSelection();
+      memberIdField.setText("");
+      nameField.setText("");
+      emailField.setText("");
+      phoneField.setText("");
+      searchField.setText("");
+      memberTable.clearSelection();
     }
 
     private void loadMembers() {
+      try {
         tableModel.setRowCount(0);
 
-        for (String[] member : readMembers()) {
+        for (String[] member : MembersService.readMembers()) {
             tableModel.addRow(member);
         }
-    }
-
-    private List<String[]> readMembers() {
-        List<String[]> members = new ArrayList<>();
-        File file = new File(FILE_PATH);
-
-        if (!file.exists()) {
-            return members;
-        }
-
-        try (BufferedReader reader = new BufferedReader(
-                new FileReader(file))) {
-
-            reader.readLine();
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",", -1);
-
-                if (data.length == 4) {
-                    members.add(data);
-                }
-            }
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error reading members.csv: "
-                            + ex.getMessage());
-        }
-
-        return members;
-    }
-
-    private boolean writeMembers(List<String[]> members) {
-        try (PrintWriter writer = new PrintWriter(
-                new FileWriter(FILE_PATH))) {
-
-            writer.println("member_id,name,email,phone");
-
-            for (String[] member : members) {
-                writer.println(String.join(",", member));
-            }
-
-            return true;
-
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this,
-                    "Error saving members.csv: "
-                            + ex.getMessage());
-            return false;
-        }
+      } catch (Exception e) {
+        System.out.println(e);
+      }
     }
 }

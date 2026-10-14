@@ -69,6 +69,8 @@ public class DashboardFrame {
         });
         membersButton.addActionListener(e -> {
             setActive(membersButton);
+
+            new MemberFrame();
             //JOptionPane.showMessageDialog(frame, "Manage Members selected.");
         });
         issueButton.addActionListener(e -> {
