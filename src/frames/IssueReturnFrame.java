@@ -1,4 +1,4 @@
-package.
+package src.frames;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -225,33 +225,8 @@ public class IssueReturnFrame extends JFrame {
             return;
         }
 
-        String issueId = tableModel.getValueAt(
-                selectedRow, 0).toString();
-
-        if (!selectedIssue[5].trim().isEmpty()) {
-            showMessage("This book has already been returned.");
-            return;
-        }
-
-        String bookId = selectedIssue[1];
-        String[] selectedBook = null;
-
-        if (selectedBook == null) {
-            showMessage("Book record not found in books.csv.");
-            return;
-        }
-
-        int quantity;
-
-        try {
-            quantity = Integer.parseInt(selectedBook[4]);
-        } catch (NumberFormatException ex) {
-            showMessage("Invalid book quantity in books.csv.");
-            return;
-        }
-
-        selectedIssue[5] = LocalDate.now().toString();
-        selectedBook[4] = String.valueOf(quantity + 1);
+        String issueId = tableModel.getValueAt(selectedRow, 0).toString();
+        String bookId = tableModel.getValueAt(selectedRow, 1).toString();
 
         try {
           if (IssueRecordsService.returnedIssueBook(issueId)) {
@@ -274,18 +249,22 @@ public class IssueReturnFrame extends JFrame {
     private void loadIssues() {
         tableModel.setRowCount(0);
 
-        for (String[] issue : IssueRecordsService.readIssuedBooks()) {
-            String status = IssueRecordsService.getStatus(issue);
+        try {
+            for (String[] issue : IssueRecordsService.readIssuedBooks()) {
+                String status = IssueRecordsService.getStatus(issue);
 
-            tableModel.addRow(new String[] {
-                issue[0],
-                issue[1],
-                issue[2],
-                issue[3],
-                issue[4],
-                issue[5],
-                status
-            });
+                tableModel.addRow(new String[] {
+                    issue[0],
+                    issue[1],
+                    issue[2],
+                    issue[3],
+                    issue[4],
+                    issue[5],
+                    status
+                });
+            }
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 
@@ -313,18 +292,22 @@ public class IssueReturnFrame extends JFrame {
 
         tableModel.setRowCount(0);
 
-        for (String[] issue : readCsv(ISSUE_FILE, 6)) {
-            String[] row = {
-                issue[0], issue[1], issue[2],
-                issue[3], issue[4], issue[5], getStatus(issue)
-            };
+        try {
+            for (String[] issue : IssueRecordsService.readIssuedBooks()) {
+                String[] row = {
+                    issue[0], issue[1], issue[2],
+                    issue[3], issue[4], issue[5], IssueRecordsService.getStatus(issue)
+                };
 
-            for (String value : row) {
-                if (value.toLowerCase().contains(keyword)) {
-                    tableModel.addRow(row);
-                    break;
+                for (String value : row) {
+                    if (value.toLowerCase().contains(keyword)) {
+                        tableModel.addRow(row);
+                        break;
+                    }
                 }
             }
+        } catch (Exception e) {
+            System.out.println(e);
         }
     }
 

@@ -75,6 +75,8 @@ public class DashboardFrame {
         });
         issueButton.addActionListener(e -> {
             setActive(issueButton);
+
+            new IssueReturnFrame();
             //JOptionPane.showMessageDialog(frame, "Issue / Return Books selected.");
         });
         usersButton.addActionListener(e -> {
