@@ -289,7 +289,7 @@ public class IssueRecordsService {
       String issuedBook[] = {""};
 
       while (issuedBookData.hasNextLine()) {
-        String line = bookData.nextLine();
+        String line = issuedBookData.nextLine();
 
         if (line.toLowerCase().contains(keyword)) {
           issuedBook = line.split(",");

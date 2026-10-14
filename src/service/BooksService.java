@@ -60,13 +60,14 @@ public class BooksService {
     return books;
   }
 
-  public static boolean writeBooks(List<String[]> books) throws Exception {
+  public static boolean writeBooks(String bookId, String title, String author, String isbn, String quantity) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
 
-    for (String[] book : books) {
-      fileWriter.append(String.join(",", book));
-    }
-
+    fileWriter.append(bookId + ",");
+    fileWriter.append(title + ",");
+    fileWriter.append(author + ",");
+    fileWriter.append(isbn + ",");
+    fileWriter.append(quantity + ",");
     fileWriter.append("\n");
 
     fileWriter.close();
@@ -170,3 +171,9 @@ public class BooksService {
     }
   }
 }
+
+/*
+TODO: Exceptions 
+1. Book ID already exists.
+2. Quantity cannot be negative.
+*/

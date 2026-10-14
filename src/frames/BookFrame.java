@@ -265,21 +265,7 @@ public class BookFrame {
       }
 
       try {
-        List<String[]> books = BooksService.readBooks();
-
-        for (String[] book : books) {
-          if (book[0].equalsIgnoreCase(bookId)) {
-            JOptionPane.showMessageDialog(frame,  "Book ID already exists.");
-
-            return;
-          }
-        }
-
-        books.add(new String[] {
-          bookId, title, author, isbn, String.valueOf(quantity)
-        });
-
-        if (BooksService.writeBooks(books)) {
+        if (BooksService.writeBooks(bookId, title, author, isbn, String.valueOf(quantity))) {
           loadBooks(frame);
           clearFields(frame);
 
