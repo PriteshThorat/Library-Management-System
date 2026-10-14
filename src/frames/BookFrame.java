@@ -28,6 +28,8 @@ public class BookFrame {
 
       initializeUI(frame);
       loadBooks(frame);
+
+      frame.setVisible(true);
   }
 
   private void initializeUI(JFrame frame) {
