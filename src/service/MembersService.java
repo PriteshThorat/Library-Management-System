@@ -34,14 +34,13 @@ public class MembersService {
     return membersCount;
   }
 
-  public static boolean writeMembers(List<String[]> members) throws Exception {
+  public static boolean writeMembers(String memberId, String name, String email, String phone) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename(), true);
 
-    for (String[] member : members) {
-      fileWriter.append(String.join(",", member));
-    }
-
-    fileWriter.append("\n");
+    fileWriter.append(memberId + ",");
+    fileWriter.append(name + ",");
+    fileWriter.append(email + ",");
+    fileWriter.append(phone + "\n");
 
     fileWriter.close();
 

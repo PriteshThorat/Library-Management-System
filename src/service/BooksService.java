@@ -67,8 +67,7 @@ public class BooksService {
     fileWriter.append(title + ",");
     fileWriter.append(author + ",");
     fileWriter.append(isbn + ",");
-    fileWriter.append(quantity + ",");
-    fileWriter.append("\n");
+    fileWriter.append(quantity + "\n");
 
     fileWriter.close();
 

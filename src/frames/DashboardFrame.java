@@ -23,7 +23,6 @@ public class DashboardFrame {
 
     private final JFrame frame;
 
-
     public DashboardFrame() throws Exception {
         frame = new JFrame("Library Management System - Dashboard");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,24 +37,24 @@ public class DashboardFrame {
     }
 
     private JPanel createContent() throws Exception {
-        JPanel content = new JPanel(new BorderLayout());
+        JPanel content = new JPanel(new BorderLayout(0, 24));
         content.setBackground(CONTENT_BG);
-        content.setBorder(new EmptyBorder(30, 34, 30, 34));
+        content.setBorder(new EmptyBorder(28, 32, 32, 32));
 
         JLabel welcome = new JLabel("Welcome, Admin");
-        welcome.setFont(new Font("Arial", Font.BOLD, 26));
+        welcome.setFont(new Font("Arial", Font.BOLD, 28));
         welcome.setForeground(TEXT);
 
-        JPanel cards = new JPanel(new GridLayout(2, 2, 22, 22));
+        JPanel cards = new JPanel(new GridLayout(2, 2, 20, 20));
         cards.setOpaque(false);
         cards.add(createStatCard("Total Books", Integer.toString(BooksService.getAllBooksCount()),
-            AppIcon.Type.BOOKS, ACCENT_BLUE));
+                AppIcon.Type.BOOKS, ACCENT_BLUE));
         cards.add(createStatCard("Total Members", Integer.toString(MembersService.getAllMembersCount()),
-            AppIcon.Type.MEMBERS, ACCENT_GREEN));
+                AppIcon.Type.MEMBERS, ACCENT_GREEN));
         cards.add(createStatCard("Issued Books", Integer.toString(IssueRecordsService.getAllIssueRecordsCount()),
-            AppIcon.Type.ISSUE, ACCENT_ORANGE));
+                AppIcon.Type.ISSUE, ACCENT_ORANGE));
         cards.add(createStatCard("Overdue Books", Integer.toString(IssueRecordsService.getAllOverdueRecordsCount()),
-            AppIcon.Type.OVERDUE, ACCENT_RED));
+                AppIcon.Type.OVERDUE, ACCENT_RED));
 
         JPanel centerWrap = new JPanel(new GridBagLayout());
         centerWrap.setOpaque(false);
@@ -65,7 +64,6 @@ public class DashboardFrame {
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
-        c.insets = new Insets(24, 0, 0, 0);
         centerWrap.add(cards, c);
 
         content.add(welcome, BorderLayout.NORTH);
@@ -75,14 +73,14 @@ public class DashboardFrame {
     }
 
     private JPanel createStatCard(String heading, String value, AppIcon.Type iconType, Color accent) {
-        RoundedPanel card = new RoundedPanel(18, Color.WHITE, BORDER);
-        card.setLayout(new BorderLayout(24, 0));
-        card.setBorder(new EmptyBorder(28, 32, 28, 32));
+        RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
+        card.setLayout(new BorderLayout(20, 0));
+        card.setBorder(new EmptyBorder(26, 30, 26, 30));
 
-        RoundedPanel badge = new RoundedPanel(18, accent, null);
-        badge.setPreferredSize(new Dimension(84, 84));
+        RoundedPanel badge = new RoundedPanel(14, accent, null);
+        badge.setPreferredSize(new Dimension(78, 78));
         badge.setLayout(new GridBagLayout());
-        badge.add(new JLabel(new AppIcon(42, Color.WHITE, iconType)));
+        badge.add(new JLabel(new AppIcon(40, Color.WHITE, iconType)));
 
         JPanel badgeWrap = new JPanel(new GridBagLayout());
         badgeWrap.setOpaque(false);
@@ -94,12 +92,12 @@ public class DashboardFrame {
         textBox.setLayout(new BoxLayout(textBox, BoxLayout.Y_AXIS));
 
         JLabel headingLabel = new JLabel(heading);
-        headingLabel.setFont(new Font("Arial", Font.PLAIN, 18));
+        headingLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         headingLabel.setForeground(MUTED);
         headingLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel valueLabel = new JLabel(value);
-        valueLabel.setFont(new Font("Arial", Font.BOLD, 44));
+        valueLabel.setFont(new Font("Arial", Font.BOLD, 42));
         valueLabel.setForeground(TEXT);
         valueLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -113,8 +111,6 @@ public class DashboardFrame {
 
         return card;
     }
-
-
 
     private static class RoundedPanel extends JPanel {
         private final int radius;
@@ -141,6 +137,4 @@ public class DashboardFrame {
             super.paintComponent(g);
         }
     }
-
-
 }

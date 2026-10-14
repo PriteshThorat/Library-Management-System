@@ -7,10 +7,10 @@ import java.awt.event.ActionListener;
 import java.awt.geom.Path2D;
 
 public class Sidebar extends JPanel {
-    private static final Color SIDEBAR_BG = new Color(33, 47, 61);
-    private static final Color SIDEBAR_HOVER = new Color(255, 255, 255, 22);
+    private static final Color SIDEBAR_BG = Color.WHITE;
+    private static final Color SIDEBAR_HOVER = new Color(245, 247, 250);
     private static final Color BLUE = new Color(26, 115, 232);
-    private static final Color NAV_TEXT = new Color(200, 208, 218);
+    private static final Color NAV_TEXT = new Color(100, 110, 125);
 
     private final String activePage;
 
@@ -21,7 +21,7 @@ public class Sidebar extends JPanel {
         setPreferredSize(new Dimension(230, 0));
         setBorder(new EmptyBorder(24, 0, 24, 0));
 
-        add(Box.createVerticalStrut(26));
+        add(Box.createVerticalStrut(8));
 
         add(nav("Dashboard", AppIcon.Type.DASHBOARD, owner));
         add(Box.createVerticalStrut(6));

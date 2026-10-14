@@ -271,7 +271,7 @@ public class MemberFrame extends JFrame {
 
             members.add(new String[] { memberId, name, email, phone });
 
-            if (MembersService.writeMembers(members)) {
+            if (MembersService.writeMembers(memberId, name, email, phone)) {
                 loadMembers();
                 clearFields();
 
