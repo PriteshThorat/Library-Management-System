@@ -38,7 +38,8 @@ public class BookFrame {
       heading.setFont(new Font("Arial", Font.BOLD, 25));
       heading.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
 
-      frame.add(heading, BorderLayout.NORTH);
+      JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+      contentPanel.add(heading, BorderLayout.NORTH);
 
       JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
       mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
@@ -119,7 +120,10 @@ public class BookFrame {
       mainPanel.add(leftPanel, BorderLayout.NORTH);
       mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-      frame.add(mainPanel, BorderLayout.CENTER);
+      contentPanel.add(mainPanel, BorderLayout.CENTER);
+
+      frame.add(new Sidebar(frame, "Books"), BorderLayout.WEST);
+      frame.add(contentPanel, BorderLayout.CENTER);
 
       addButton.addActionListener(e -> addBook(frame));
       updateButton.addActionListener(e -> updateBook(frame));

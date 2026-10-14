@@ -40,7 +40,8 @@ public class MemberFrame extends JFrame {
         heading.setBorder(
                 BorderFactory.createEmptyBorder(15, 0, 10, 0));
 
-        add(heading, BorderLayout.NORTH);
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.add(heading, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(
@@ -123,7 +124,10 @@ public class MemberFrame extends JFrame {
         mainPanel.add(leftPanel, BorderLayout.NORTH);
         mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-        add(mainPanel, BorderLayout.CENTER);
+        contentPanel.add(mainPanel, BorderLayout.CENTER);
+
+        add(new Sidebar(this, "Members"), BorderLayout.WEST);
+        add(contentPanel, BorderLayout.CENTER);
 
         addButton.addActionListener(e -> addMember());
         updateButton.addActionListener(e -> updateMember());

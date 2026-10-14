@@ -1,3 +1,4 @@
 *.env
 *.class
 *.csv
+dist

@@ -47,7 +47,8 @@ public class IssueReturnFrame extends JFrame {
         heading.setBorder(
                 BorderFactory.createEmptyBorder(15, 0, 10, 0));
 
-        add(heading, BorderLayout.NORTH);
+        JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.add(heading, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(
@@ -136,7 +137,10 @@ public class IssueReturnFrame extends JFrame {
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(tablePanel, BorderLayout.CENTER);
 
-        add(mainPanel, BorderLayout.CENTER);
+        contentPanel.add(mainPanel, BorderLayout.CENTER);
+
+        add(new Sidebar(this, "Issue / Return"), BorderLayout.WEST);
+        add(contentPanel, BorderLayout.CENTER);
 
         issueButton.addActionListener(e -> issueBook());
         returnButton.addActionListener(e -> returnBook());
