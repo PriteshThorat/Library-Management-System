@@ -98,7 +98,7 @@ public class MembersService {
       }
     }
     
-    FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename());
+    FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename());
     
     fileWriter.write(updatedMemberData);
     fileWriter.write("\n");
@@ -136,8 +136,8 @@ public class MembersService {
 
   public static String[] searchMember (String keyword) {
     try {
-      File file = new File(EnvConfig.getBooksFilename());
-      FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
+      File file = new File(EnvConfig.getMembersFilename());
+      FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename(), true);
 
       Scanner memberData = new Scanner(file);
       String member[] = {""};
