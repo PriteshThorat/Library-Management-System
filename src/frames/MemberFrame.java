@@ -259,18 +259,6 @@ public class MemberFrame extends JFrame {
         }
 
         try {
-            List<String[]> members = MembersService.readMembers();
-
-            for (String[] member : members) {
-                if (member[0].equalsIgnoreCase(memberId)) {
-                    JOptionPane.showMessageDialog(this,
-                            "Member ID already exists.");
-                    return;
-                }
-            }
-
-            members.add(new String[] { memberId, name, email, phone });
-
             if (MembersService.writeMembers(memberId, name, email, phone)) {
                 loadMembers();
                 clearFields();

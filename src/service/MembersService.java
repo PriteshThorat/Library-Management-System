@@ -100,7 +100,6 @@ public class MembersService {
     FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename());
     
     fileWriter.write(updatedMemberData);
-    fileWriter.write("\n");
 
     memberData.close();
     fileWriter.close();
