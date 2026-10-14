@@ -29,6 +29,7 @@ public class DashboardFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
+        frame.add(new Header("Library Management System - Dashboard"), BorderLayout.NORTH);
         frame.add(new Sidebar(frame, "Dashboard"), BorderLayout.WEST);
         frame.add(createContent(), BorderLayout.CENTER);
 

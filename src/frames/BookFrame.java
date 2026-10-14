@@ -1,14 +1,28 @@
 package src.frames;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 import src.service.BooksService;
 
 import java.awt.*;
+import java.awt.geom.RoundRectangle2D;
 import java.util.List;
 
 public class BookFrame {
+  private static final Color CONTENT_BG = new Color(245, 247, 250);
+  private static final Color BORDER = new Color(226, 232, 240);
+  private static final Color TEXT = new Color(33, 37, 41);
+  private static final Color MUTED = new Color(120, 130, 145);
+  private static final Color FIELD_BG = new Color(248, 250, 252);
+
+  private static final Color BLUE = new Color(26, 115, 232);
+  private static final Color GREEN = new Color(52, 168, 83);
+  private static final Color RED = new Color(220, 53, 69);
+  private static final Color GRAY = new Color(108, 117, 125);
+
   private JTextField bookIdField;
   private JTextField titleField;
   private JTextField authorField;
@@ -19,7 +33,7 @@ public class BookFrame {
   private JTable bookTable;
   private DefaultTableModel tableModel;
 
-  public BookFrame () {
+  public BookFrame() {
     JFrame frame = new JFrame("Manage Books");
     frame.setTitle("Library Management System - Books");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -32,63 +46,115 @@ public class BookFrame {
   }
 
   private void initializeUI(JFrame frame) {
-      frame.setLayout(new BorderLayout(10, 10));
+      frame.setLayout(new BorderLayout());
 
-      JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+      JPanel content = new JPanel(new BorderLayout(0, 20));
+      content.setBackground(CONTENT_BG);
+      content.setBorder(new EmptyBorder(24, 30, 28, 30));
+      content.add(createFormCard(), BorderLayout.NORTH);
+      content.add(createTableCard(), BorderLayout.CENTER);
 
-      JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
-      mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
+      frame.add(new Header("Library Management System - Books"), BorderLayout.NORTH);
+      frame.add(new Sidebar(frame, "Books"), BorderLayout.WEST);
+      frame.add(content, BorderLayout.CENTER);
+  }
 
-      JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
-      formPanel.setBorder(BorderFactory.createTitledBorder("Book Details"));
+  private JPanel createFormCard() {
+      RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
+      card.setLayout(new BorderLayout(0, 18));
+      card.setBorder(new EmptyBorder(24, 28, 24, 28));
 
-      bookIdField = new JTextField();
-      titleField = new JTextField();
-      authorField = new JTextField();
-      isbnField = new JTextField();
-      quantityField = new JTextField();
+      JLabel title = new JLabel("Book Details");
+      title.setFont(new Font("Arial", Font.BOLD, 18));
+      title.setForeground(TEXT);
+      card.add(title, BorderLayout.NORTH);
 
-      formPanel.add(new JLabel("Book ID:"));
-      formPanel.add(bookIdField);
+      bookIdField = createField();
+      titleField = createField();
+      authorField = createField();
+      isbnField = createField();
+      quantityField = createField();
 
-      formPanel.add(new JLabel("Title:"));
-      formPanel.add(titleField);
+      JPanel form = new JPanel(new GridBagLayout());
+      form.setOpaque(false);
 
-      formPanel.add(new JLabel("Author:"));
-      formPanel.add(authorField);
+      GridBagConstraints gc = new GridBagConstraints();
+      gc.insets = new Insets(8, 6, 8, 6);
 
-      formPanel.add(new JLabel("ISBN:"));
-      formPanel.add(isbnField);
+      addField(form, gc, 0, "Book ID:", bookIdField);
+      addField(form, gc, 1, "Title:", titleField);
+      addField(form, gc, 2, "Author:", authorField);
+      addField(form, gc, 3, "ISBN:", isbnField);
+      addField(form, gc, 4, "Quantity:", quantityField);
 
-      formPanel.add(new JLabel("Quantity:"));
-      formPanel.add(quantityField);
+      JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
+      buttons.setOpaque(false);
 
-      JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+      JButton addButton = new RoundedButton("Add Book", BLUE);
+      JButton updateButton = new RoundedButton("Update Book", GREEN);
+      JButton deleteButton = new RoundedButton("Delete Book", RED);
+      JButton clearButton = new RoundedButton("Clear", GRAY);
 
-      JButton addButton = new JButton("Add Book");
-      JButton updateButton = new JButton("Update Book");
-      JButton deleteButton = new JButton("Delete Book");
-      JButton clearButton = new JButton("Clear");
+      buttons.add(addButton);
+      buttons.add(updateButton);
+      buttons.add(deleteButton);
+      buttons.add(clearButton);
 
-      buttonPanel.add(addButton);
-      buttonPanel.add(updateButton);
-      buttonPanel.add(deleteButton);
-      buttonPanel.add(clearButton);
+      JPanel body = new JPanel(new BorderLayout(0, 16));
+      body.setOpaque(false);
+      body.add(form, BorderLayout.CENTER);
+      body.add(buttons, BorderLayout.SOUTH);
 
-      JPanel leftPanel = new JPanel(new BorderLayout(5, 10));
-      leftPanel.add(formPanel, BorderLayout.CENTER);
-      leftPanel.add(buttonPanel, BorderLayout.SOUTH);
+      card.add(body, BorderLayout.CENTER);
 
-      JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+      addButton.addActionListener(e -> addBook((JFrame) SwingUtilities.getWindowAncestor(card)));
+      updateButton.addActionListener(e -> updateBook((JFrame) SwingUtilities.getWindowAncestor(card)));
+      deleteButton.addActionListener(e -> deleteBook((JFrame) SwingUtilities.getWindowAncestor(card)));
+      clearButton.addActionListener(e -> clearFields((JFrame) SwingUtilities.getWindowAncestor(card)));
+
+      return card;
+  }
+
+  private JPanel createTableCard() {
+      RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
+      card.setLayout(new BorderLayout(0, 16));
+      card.setBorder(new EmptyBorder(24, 28, 24, 28));
+
+      JPanel top = new JPanel(new BorderLayout());
+      top.setOpaque(false);
+
+      JLabel title = new JLabel("Book List");
+      title.setFont(new Font("Arial", Font.BOLD, 18));
+      title.setForeground(TEXT);
+      top.add(title, BorderLayout.WEST);
+
+      JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+      searchPanel.setOpaque(false);
 
       searchField = new JTextField(20);
-      JButton searchButton = new JButton("Search");
-      JButton showAllButton = new JButton("Show All");
+      searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+      searchField.setForeground(TEXT);
+      searchField.setBackground(FIELD_BG);
+      searchField.setCaretColor(TEXT);
+      searchField.setPreferredSize(new Dimension(220, 38));
+      searchField.setBorder(BorderFactory.createCompoundBorder(
+          new RoundedLineBorder(BORDER, 8, 1),
+          new EmptyBorder(6, 12, 6, 12)));
 
-      searchPanel.add(new JLabel("Search:"));
+      JButton searchButton = new RoundedButton("Search", BLUE);
+      JButton showAllButton = new RoundedButton("Show All", GRAY);
+
+      JLabel searchLabel = new JLabel("Search:");
+      searchLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+      searchLabel.setForeground(MUTED);
+
+      searchPanel.add(searchLabel);
       searchPanel.add(searchField);
       searchPanel.add(searchButton);
       searchPanel.add(showAllButton);
+
+      top.add(searchPanel, BorderLayout.EAST);
+      card.add(top, BorderLayout.NORTH);
 
       String[] columns = {
         "Book ID", "Title", "Author", "ISBN", "Quantity"
@@ -103,35 +169,72 @@ public class BookFrame {
 
       bookTable = new JTable(tableModel);
       bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      bookTable.setRowHeight(25);
+      bookTable.setRowHeight(32);
+      bookTable.setFont(new Font("Arial", Font.PLAIN, 14));
+      bookTable.setForeground(TEXT);
+      bookTable.setGridColor(BORDER);
+      bookTable.setShowVerticalLines(false);
+      bookTable.setIntercellSpacing(new Dimension(0, 0));
+      bookTable.setSelectionBackground(new Color(232, 240, 254));
+      bookTable.setSelectionForeground(TEXT);
+      bookTable.setFocusable(false);
       bookTable.getTableHeader().setReorderingAllowed(false);
 
+      JTableHeader header = bookTable.getTableHeader();
+      header.setFont(new Font("Arial", Font.BOLD, 13));
+      header.setForeground(MUTED);
+      header.setBackground(new Color(248, 250, 252));
+      header.setPreferredSize(new Dimension(0, 40));
+      header.setBorder(new EmptyBorder(0, 0, 0, 0));
+
       JScrollPane scrollPane = new JScrollPane(bookTable);
+      scrollPane.setBorder(BorderFactory.createLineBorder(BORDER));
+      scrollPane.getViewport().setBackground(Color.WHITE);
 
-      JPanel tablePanel = new JPanel(new BorderLayout(5, 10));
-      tablePanel.add(searchPanel, BorderLayout.NORTH);
-      tablePanel.add(scrollPane, BorderLayout.CENTER);
+      card.add(scrollPane, BorderLayout.CENTER);
 
-      mainPanel.add(leftPanel, BorderLayout.NORTH);
-      mainPanel.add(tablePanel, BorderLayout.CENTER);
-
-      contentPanel.add(mainPanel, BorderLayout.CENTER);
-
-      frame.add(new Sidebar(frame, "Books"), BorderLayout.WEST);
-      frame.add(contentPanel, BorderLayout.CENTER);
-
-      addButton.addActionListener(e -> addBook(frame));
-      updateButton.addActionListener(e -> updateBook(frame));
-      deleteButton.addActionListener(e -> deleteBook(frame));
-      clearButton.addActionListener(e -> clearFields(frame));
-      searchButton.addActionListener(e -> searchBooks(frame));
-      showAllButton.addActionListener(e -> loadBooks(frame));
+      searchButton.addActionListener(e -> searchBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
+      showAllButton.addActionListener(e -> loadBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
 
       bookTable.getSelectionModel().addListSelectionListener(e -> {
           if (!e.getValueIsAdjusting()) {
               fillFieldsFromTable();
           }
       });
+
+      return card;
+  }
+
+  private void addField(JPanel form, GridBagConstraints gc, int row, String labelText, JTextField field) {
+      gc.gridx = 0;
+      gc.gridy = row;
+      gc.anchor = GridBagConstraints.EAST;
+      gc.fill = GridBagConstraints.NONE;
+      gc.weightx = 0;
+
+      JLabel label = new JLabel(labelText);
+      label.setFont(new Font("Arial", Font.PLAIN, 14));
+      label.setForeground(MUTED);
+      form.add(label, gc);
+
+      gc.gridx = 1;
+      gc.anchor = GridBagConstraints.WEST;
+      gc.fill = GridBagConstraints.HORIZONTAL;
+      gc.weightx = 1;
+      form.add(field, gc);
+  }
+
+  private JTextField createField() {
+      JTextField field = new JTextField();
+      field.setFont(new Font("Arial", Font.PLAIN, 14));
+      field.setForeground(TEXT);
+      field.setBackground(FIELD_BG);
+      field.setCaretColor(TEXT);
+      field.setPreferredSize(new Dimension(280, 38));
+      field.setBorder(BorderFactory.createCompoundBorder(
+          new RoundedLineBorder(BORDER, 8, 1),
+          new EmptyBorder(6, 12, 6, 12)));
+      return field;
   }
 
   private void addBook(JFrame frame) {
@@ -160,7 +263,7 @@ public class BookFrame {
                   "Quantity must be a valid integer.");
           return;
       }
-      
+
       try {
         List<String[]> books = BooksService.readBooks();
 
@@ -204,7 +307,7 @@ public class BookFrame {
 
     if (bookId.isEmpty() || title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantityText.isEmpty()) {
       JOptionPane.showMessageDialog(frame,  "Please fill in all fields.");
-      
+
       return;
     }
 
@@ -224,15 +327,6 @@ public class BookFrame {
       return;
     }
 
-    // TODO: Future Changes
-    // List<String[]> books = new ArrayList<>();
-
-    // books.add(new String[] {
-    //   bookId, title, author, isbn, String.valueOf(quantity)
-    // });
-
-    //String originalBookId = tableModel.getValueAt(selectedRow, 0).toString();
-
     try {
       if (BooksService.updateBook(bookId, title, author, isbn, String.valueOf(quantity))) {
         loadBooks(frame);
@@ -250,7 +344,7 @@ public class BookFrame {
 
     if (selectedRow == -1) {
       JOptionPane.showMessageDialog(frame,  "Please select a book to delete.");
-      
+
       return;
     }
 
@@ -331,5 +425,87 @@ public class BookFrame {
     } catch (Exception e) {
       System.out.println(e);
     }
+  }
+
+  private static class RoundedPanel extends JPanel {
+      private final int radius;
+      private final Color fill;
+      private final Color border;
+
+      RoundedPanel(int radius, Color fill, Color border) {
+          this.radius = radius;
+          this.fill = fill;
+          this.border = border;
+          setOpaque(false);
+      }
+
+      protected void paintComponent(Graphics g) {
+          Graphics2D g2 = (Graphics2D) g.create();
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setColor(fill);
+          g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+          if (border != null) {
+              g2.setColor(border);
+              g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, radius, radius);
+          }
+          g2.dispose();
+          super.paintComponent(g);
+      }
+  }
+
+  private static class RoundedButton extends JButton {
+      private final Color base;
+
+      RoundedButton(String text, Color base) {
+          super(text);
+          this.base = base;
+          setFont(new Font("Arial", Font.BOLD, 14));
+          setForeground(Color.WHITE);
+          setFocusPainted(false);
+          setBorderPainted(false);
+          setContentAreaFilled(false);
+          setOpaque(false);
+          setCursor(new Cursor(Cursor.HAND_CURSOR));
+          setPreferredSize(new Dimension(130, 38));
+      }
+
+      protected void paintComponent(Graphics g) {
+          Graphics2D g2 = (Graphics2D) g.create();
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setColor(getModel().isRollover() ? base.darker() : base);
+          g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 8, 8));
+          g2.dispose();
+          super.paintComponent(g);
+      }
+  }
+
+  private static class RoundedLineBorder extends javax.swing.border.AbstractBorder {
+      private final Color color;
+      private final int radius;
+      private final int thickness;
+
+      RoundedLineBorder(Color color, int radius, int thickness) {
+          this.color = color;
+          this.radius = radius;
+          this.thickness = thickness;
+      }
+
+      public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+          Graphics2D g2 = (Graphics2D) g.create();
+          g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+          g2.setColor(color);
+          g2.setStroke(new BasicStroke(thickness));
+          g2.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+          g2.dispose();
+      }
+
+      public Insets getBorderInsets(Component c) {
+          return new Insets(thickness + 1, thickness + 1, thickness + 1, thickness + 1);
+      }
+
+      public Insets getBorderInsets(Component c, Insets insets) {
+          insets.set(thickness + 1, thickness + 1, thickness + 1, thickness + 1);
+          return insets;
+      }
   }
 }

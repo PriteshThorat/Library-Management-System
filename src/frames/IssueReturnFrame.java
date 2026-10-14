@@ -37,9 +37,11 @@ public class IssueReturnFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout(10, 10));
+        setLayout(new BorderLayout());
 
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
+        contentPanel.setBorder(
+                BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(
@@ -130,6 +132,7 @@ public class IssueReturnFrame extends JFrame {
 
         contentPanel.add(mainPanel, BorderLayout.CENTER);
 
+        add(new Header("Library Management System - Issue / Return"), BorderLayout.NORTH);
         add(new Sidebar(this, "Issue / Return"), BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 

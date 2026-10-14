@@ -279,4 +279,38 @@ public class IssueRecordsService {
 
     return issuedBooks;
   }
+
+  public static String[] searchIssuedBooks (String keyword) {
+    try {
+      File file = new File(EnvConfig.getIssueRecordsFilename());
+      FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename(), true);
+
+      Scanner issuedBookData = new Scanner(file);
+      String issuedBook[] = {""};
+
+      while (issuedBookData.hasNextLine()) {
+        String line = bookData.nextLine();
+
+        if (line.toLowerCase().contains(keyword)) {
+          issuedBook = line.split(",");
+            
+          issuedBookData.close();
+          fileWriter.close();
+          
+          return issuedBook;
+        }
+      }
+
+      fileWriter.close();
+      issuedBookData.close();
+
+      return issuedBook;
+    } catch (Exception e) {
+      String issuedBook[] = {""};
+
+      System.out.println(e);
+
+      return issuedBook;
+    }
+  }
 }
