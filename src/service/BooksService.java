@@ -63,11 +63,11 @@ public class BooksService {
   public static boolean writeBooks(List<String[]> books) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
 
-    fileWriter.append("\n");
-
     for (String[] book : books) {
       fileWriter.append(String.join(",", book));
     }
+
+    fileWriter.append("\n");
 
     fileWriter.close();
 
@@ -127,8 +127,8 @@ public class BooksService {
     
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename());
     
-    fileWriter.write("\n");
     fileWriter.write(updatedBookData);
+    fileWriter.write("\n");
 
     bookData.close();
     fileWriter.close();

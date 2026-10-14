@@ -20,15 +20,15 @@ public class BookFrame {
   private DefaultTableModel tableModel;
 
   public BookFrame () {
-      JFrame frame = new JFrame("Manage Books");
-      frame.setTitle("Library Management System - Books");
-      frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+    JFrame frame = new JFrame("Manage Books");
+    frame.setTitle("Library Management System - Books");
+    frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-      initializeUI(frame);
-      loadBooks(frame);
+    initializeUI(frame);
+    loadBooks(frame);
 
-      frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-      frame.setVisible(true);
+    frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    frame.setVisible(true);
   }
 
   private void initializeUI(JFrame frame) {
