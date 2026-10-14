@@ -6,8 +6,6 @@ import javax.swing.table.DefaultTableModel;
 import src.service.BooksService;
 
 import java.awt.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BookFrame {
@@ -21,7 +19,7 @@ public class BookFrame {
   private JTable bookTable;
   private DefaultTableModel tableModel;
 
-  public BookFrame () throws Exception {
+  public BookFrame () {
       JFrame frame = new JFrame("Manage Books");
       frame.setTitle("Library Management System - Books");
       frame.setSize(900, 600);
@@ -32,7 +30,7 @@ public class BookFrame {
       loadBooks(frame);
   }
 
-  private void initializeUI(JFrame frame) throws Exception {
+  private void initializeUI(JFrame frame) {
       frame.setLayout(new BorderLayout(10, 10));
 
       JLabel heading = new JLabel("Book Management", SwingConstants.CENTER);
@@ -122,16 +120,12 @@ public class BookFrame {
 
       frame.add(mainPanel, BorderLayout.CENTER);
 
-      try {
-        addButton.addActionListener(e -> addBook(frame));
-        updateButton.addActionListener(e -> updateBook(frame));
-        deleteButton.addActionListener(e -> deleteBook(frame));
-        clearButton.addActionListener(e -> clearFields(frame));
-        searchButton.addActionListener(e -> searchBooks(frame));
-        showAllButton.addActionListener(e -> loadBooks(frame));
-      } catch (Exception e) {
-        System.out.println(e);
-      }
+      addButton.addActionListener(e -> addBook(frame));
+      updateButton.addActionListener(e -> updateBook(frame));
+      deleteButton.addActionListener(e -> deleteBook(frame));
+      clearButton.addActionListener(e -> clearFields(frame));
+      searchButton.addActionListener(e -> BooksService.searchBooks(searchField.getText().trim().toLowerCase()));
+      showAllButton.addActionListener(e -> loadBooks(frame));
 
       bookTable.getSelectionModel().addListSelectionListener(e -> {
           if (!e.getValueIsAdjusting()) {
@@ -140,7 +134,7 @@ public class BookFrame {
       });
   }
 
-  private void addBook(JFrame frame) throws Exception {
+  private void addBook(JFrame frame) {
     String bookId = bookIdField.getText().trim();
     String title = titleField.getText().trim();
     String author = authorField.getText().trim();
@@ -166,156 +160,118 @@ public class BookFrame {
                   "Quantity must be a valid integer.");
           return;
       }
+      
+      try {
+        List<String[]> books = BooksService.readBooks();
 
-      List<String[]> books = BooksService.readBooks();
-
-      for (String[] book : books) {
+        for (String[] book : books) {
           if (book[0].equalsIgnoreCase(bookId)) {
-              JOptionPane.showMessageDialog(frame,
-                      "Book ID already exists.");
-              return;
+            JOptionPane.showMessageDialog(frame,  "Book ID already exists.");
+
+            return;
           }
-      }
+        }
 
-      books.add(new String[] {
+        books.add(new String[] {
           bookId, title, author, isbn, String.valueOf(quantity)
-      });
+        });
 
-      if (BooksService.writeBooks(books)) {
-        loadBooks(frame);
-        clearFields(frame);
+        if (BooksService.writeBooks(books)) {
+          loadBooks(frame);
+          clearFields(frame);
 
-        JOptionPane.showMessageDialog(frame,  "Book added successfully.");
+          JOptionPane.showMessageDialog(frame,  "Book added successfully.");
+        }
+      } catch (Exception e) {
+        System.out.println(e);
       }
   }
 
-  private void updateBook(JFrame frame) throws Exception {
-      int selectedRow = bookTable.getSelectedRow();
+  private void updateBook(JFrame frame) {
+    int selectedRow = bookTable.getSelectedRow();
 
-      if (selectedRow == -1) {
-          JOptionPane.showMessageDialog(frame,
-                  "Please select a book to update.");
-          return;
+    if (selectedRow == -1) {
+      JOptionPane.showMessageDialog(frame,  "Please select a book to update.");
+
+      return;
+    }
+
+    String bookId = bookIdField.getText().trim();
+    String title = titleField.getText().trim();
+    String author = authorField.getText().trim();
+    String isbn = isbnField.getText().trim();
+    String quantityText = quantityField.getText().trim();
+
+    if (bookId.isEmpty() || title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantityText.isEmpty()) {
+      JOptionPane.showMessageDialog(frame,  "Please fill in all fields.");
+      
+      return;
+    }
+
+    int quantity;
+
+    try {
+      quantity = Integer.parseInt(quantityText);
+
+      if (quantity < 0) {
+        JOptionPane.showMessageDialog(frame,  "Quantity cannot be negative.");
+
+        return;
       }
+    } catch (NumberFormatException ex) {
+      JOptionPane.showMessageDialog(frame,  "Quantity must be a valid integer.");
 
-      String bookId = bookIdField.getText().trim();
-      String title = titleField.getText().trim();
-      String author = authorField.getText().trim();
-      String isbn = isbnField.getText().trim();
-      String quantityText = quantityField.getText().trim();
+      return;
+    }
 
-      if (bookId.isEmpty() || title.isEmpty()
-              || author.isEmpty() || isbn.isEmpty()
-              || quantityText.isEmpty()) {
-          JOptionPane.showMessageDialog(frame,
-                  "Please fill in all fields.");
-          return;
-      }
+    // TODO: Future Changes
+    // List<String[]> books = new ArrayList<>();
 
-      int quantity;
+    // books.add(new String[] {
+    //   bookId, title, author, isbn, String.valueOf(quantity)
+    // });
 
-      try {
-          quantity = Integer.parseInt(quantityText);
+    //String originalBookId = tableModel.getValueAt(selectedRow, 0).toString();
 
-          if (quantity < 0) {
-              JOptionPane.showMessageDialog(frame,
-                      "Quantity cannot be negative.");
-              return;
-          }
-      } catch (NumberFormatException ex) {
-          JOptionPane.showMessageDialog(frame,
-                  "Quantity must be a valid integer.");
-          return;
-      }
-
-      String originalBookId = tableModel.getValueAt(
-              selectedRow, 0).toString();
-
-      List<String[]> books = BooksService.readBooks();
-
-      for (String[] book : books) {
-          if (!book[0].equalsIgnoreCase(originalBookId)
-                  && book[0].equalsIgnoreCase(bookId)) {
-              JOptionPane.showMessageDialog(frame,
-                      "Another book already uses this Book ID.");
-              return;
-          }
-      }
-
-      boolean updated = false;
-
-      for (String[] book : books) {
-          if (book[0].equalsIgnoreCase(originalBookId)) {
-              book[0] = bookId;
-              book[1] = title;
-              book[2] = author;
-              book[3] = isbn;
-              book[4] = String.valueOf(quantity);
-              updated = true;
-              break;
-          }
-      }
-
-      if (updated && BooksService.writeBooks(books)) {
+    try {
+      if (BooksService.updateBook(bookId, title, author, isbn, String.valueOf(quantity))) {
         loadBooks(frame);
         clearFields(frame);
 
         JOptionPane.showMessageDialog(frame,  "Book updated successfully.");
       }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
-  private void deleteBook(JFrame frame) throws Exception {
-      int selectedRow = bookTable.getSelectedRow();
+  private void deleteBook(JFrame frame) {
+    int selectedRow = bookTable.getSelectedRow();
 
-      if (selectedRow == -1) {
-          JOptionPane.showMessageDialog(frame,
-                  "Please select a book to delete.");
-          return;
+    if (selectedRow == -1) {
+      JOptionPane.showMessageDialog(frame,  "Please select a book to delete.");
+      
+      return;
+    }
+
+    String bookId = tableModel.getValueAt(selectedRow, 0).toString();
+
+    int choice = JOptionPane.showConfirmDialog(frame,  "Delete book " + bookId + "?",  "Confirm Delete",  JOptionPane.YES_NO_OPTION);
+
+    if (choice != JOptionPane.YES_OPTION) {
+      return;
+    }
+
+    try {
+      if (BooksService.deleteBook(bookId)) {
+        loadBooks(frame);
+        clearFields(frame);
+
+        JOptionPane.showMessageDialog(frame,  "Book deleted successfully.");
       }
-
-      String bookId = tableModel.getValueAt(
-              selectedRow, 0).toString();
-
-      int choice = JOptionPane.showConfirmDialog(frame,
-              "Delete book " + bookId + "?",
-              "Confirm Delete",
-              JOptionPane.YES_NO_OPTION);
-
-      if (choice != JOptionPane.YES_OPTION) {
-          return;
-      }
-
-      List<String[]> books = BooksService.readBooks();
-      books.removeIf(book -> book[0].equalsIgnoreCase(bookId));
-
-      if (writeBooks(books, frame)) {
-          loadBooks(frame);
-          clearFields(frame);
-
-          JOptionPane.showMessageDialog(frame,
-                  "Book deleted successfully.");
-      }
-  }
-
-  private void searchBooks(JFrame frame) throws Exception {
-      String keyword = searchField.getText().trim().toLowerCase();
-
-      tableModel.setRowCount(0);
-
-      for (String[] book : BooksService.readBooks()) {
-          boolean matches = false;
-
-          for (String value : book) {
-              if (value.toLowerCase().contains(keyword)) {
-                  matches = true;
-                  break;
-              }
-          }
-
-          if (matches) {
-              tableModel.addRow(book);
-          }
-      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   private void fillFieldsFromTable() {
@@ -344,8 +300,12 @@ public class BookFrame {
   private void loadBooks(JFrame frame) {
     tableModel.setRowCount(0);
 
-    for (String[] book : BooksService.readBooks();) {
-      tableModel.addRow(book);
+    try {
+      for (String[] book : BooksService.readBooks()) {
+        tableModel.addRow(book);
+      }
+    } catch (Exception e) {
+      System.out.println(e);
     }
   }
 }
