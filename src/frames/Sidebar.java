@@ -21,14 +21,6 @@ public class Sidebar extends JPanel {
         setPreferredSize(new Dimension(230, 0));
         setBorder(new EmptyBorder(24, 0, 24, 0));
 
-        JPanel brand = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
-        brand.setOpaque(false);
-        brand.setBorder(new EmptyBorder(0, 24, 0, 0));
-        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
-        brand.setMaximumSize(new Dimension(Integer.MAX_VALUE, 34));
-        brand.add(new JLabel(new AppIcon(26, Color.WHITE, AppIcon.Type.BOOKS)));
-
-        add(brand);
         add(Box.createVerticalStrut(26));
 
         add(nav("Dashboard", AppIcon.Type.DASHBOARD, owner));
