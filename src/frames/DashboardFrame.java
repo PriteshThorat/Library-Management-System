@@ -29,35 +29,12 @@ public class DashboardFrame {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        frame.add(createHeader(), BorderLayout.NORTH);
         frame.add(new Sidebar(frame, "Dashboard"), BorderLayout.WEST);
         frame.add(createContent(), BorderLayout.CENTER);
 
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
     }
-
-
-
-    private JPanel createHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBackground(Color.WHITE);
-        header.setBorder(BorderFactory.createCompoundBorder(
-            new MatteBorder(0, 0, 1, 0, BORDER),
-            new EmptyBorder(0, 26, 0, 26)
-        ));
-        header.setPreferredSize(new Dimension(0, 64));
-
-        JLabel title = new JLabel("Library Management System - Dashboard");
-        title.setFont(new Font("Arial", Font.BOLD, 20));
-        title.setForeground(TEXT);
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-        header.add(title, BorderLayout.CENTER);
-
-        return header;
-    }
-
-
 
     private JPanel createContent() throws Exception {
         JPanel content = new JPanel(new BorderLayout());

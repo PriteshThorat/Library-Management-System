@@ -39,16 +39,7 @@ public class IssueReturnFrame extends JFrame {
     private void initializeUI() {
         setLayout(new BorderLayout(10, 10));
 
-        JLabel heading = new JLabel(
-                "Book Issue & Return Management",
-                SwingConstants.CENTER);
-
-        heading.setFont(new Font("Arial", Font.BOLD, 24));
-        heading.setBorder(
-                BorderFactory.createEmptyBorder(15, 0, 10, 0));
-
         JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
-        contentPanel.add(heading, BorderLayout.NORTH);
 
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(

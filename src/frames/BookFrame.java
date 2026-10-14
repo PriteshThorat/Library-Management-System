@@ -34,12 +34,7 @@ public class BookFrame {
   private void initializeUI(JFrame frame) {
       frame.setLayout(new BorderLayout(10, 10));
 
-      JLabel heading = new JLabel("Book Management", SwingConstants.CENTER);
-      heading.setFont(new Font("Arial", Font.BOLD, 25));
-      heading.setBorder(BorderFactory.createEmptyBorder(15, 0, 10, 0));
-
       JPanel contentPanel = new JPanel(new BorderLayout(10, 10));
-      contentPanel.add(heading, BorderLayout.NORTH);
 
       JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
       mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 15, 15, 15));
