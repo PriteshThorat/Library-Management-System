@@ -22,13 +22,12 @@ public class BookFrame {
   public BookFrame () {
       JFrame frame = new JFrame("Manage Books");
       frame.setTitle("Library Management System - Books");
-      frame.setSize(900, 600);
       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-      frame.setLocationRelativeTo(null);
 
       initializeUI(frame);
       loadBooks(frame);
 
+      frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
       frame.setVisible(true);
   }
 
@@ -126,7 +125,7 @@ public class BookFrame {
       updateButton.addActionListener(e -> updateBook(frame));
       deleteButton.addActionListener(e -> deleteBook(frame));
       clearButton.addActionListener(e -> clearFields(frame));
-      searchButton.addActionListener(e -> BooksService.searchBooks(searchField.getText().trim().toLowerCase()));
+      searchButton.addActionListener(e -> searchBooks(frame));
       showAllButton.addActionListener(e -> loadBooks(frame));
 
       bookTable.getSelectionModel().addListSelectionListener(e -> {
@@ -305,6 +304,30 @@ public class BookFrame {
     try {
       for (String[] book : BooksService.readBooks()) {
         tableModel.addRow(book);
+      }
+    } catch (Exception e) {
+      System.out.println(e);
+    }
+  }
+
+  private void searchBooks(JFrame frame) {
+    String keyword = searchField.getText().trim().toLowerCase();
+
+    if (keyword.isEmpty()) {
+      loadBooks(frame);
+
+      return;
+    }
+
+    tableModel.setRowCount(0);
+
+    try {
+      for (String[] book : BooksService.readBooks()) {
+        String row = String.join(",", book).toLowerCase();
+
+        if (row.contains(keyword)) {
+          tableModel.addRow(book);
+        }
       }
     } catch (Exception e) {
       System.out.println(e);
