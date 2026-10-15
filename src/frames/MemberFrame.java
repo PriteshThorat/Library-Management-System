@@ -5,6 +5,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import src.config.ConstantsConfig;
 import src.service.MembersService;
 
 import java.awt.*;
@@ -44,20 +45,24 @@ public class MemberFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout());
+        try {
+            setLayout(new BorderLayout());
 
-        JPanel content = new JPanel(new BorderLayout(0, 20));
-        content.setBackground(CONTENT_BG);
-        content.setBorder(new EmptyBorder(24, 30, 28, 30));
-        content.add(createFormCard(), BorderLayout.NORTH);
-        content.add(createTableCard(), BorderLayout.CENTER);
+            JPanel content = new JPanel(new BorderLayout(0, 20));
+            content.setBackground(CONTENT_BG);
+            content.setBorder(new EmptyBorder(24, 30, 28, 30));
+            content.add(createFormCard(), BorderLayout.NORTH);
+            content.add(createTableCard(), BorderLayout.CENTER);
 
-        add(new Header("Library Management System - Members"), BorderLayout.NORTH);
-        add(new Sidebar(this, "Members"), BorderLayout.WEST);
-        add(content, BorderLayout.CENTER);
+            add(new Header("Library Management System - Members"), BorderLayout.NORTH);
+            add(new Sidebar(this, "Members"), BorderLayout.WEST);
+            add(content, BorderLayout.CENTER);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
-    private JPanel createFormCard() {
+    private JPanel createFormCard() throws Exception {
         RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
         card.setLayout(new BorderLayout(0, 18));
         card.setBorder(new EmptyBorder(24, 28, 24, 28));
@@ -67,7 +72,7 @@ public class MemberFrame extends JFrame {
         title.setForeground(TEXT);
         card.add(title, BorderLayout.NORTH);
 
-        memberIdField = createField();
+        memberIdField = createField(ConstantsConfig.getMemberId());
         nameField = createField();
         emailField = createField();
         phoneField = createField();
@@ -227,9 +232,20 @@ public class MemberFrame extends JFrame {
         field.setBackground(FIELD_BG);
         field.setCaretColor(TEXT);
         field.setPreferredSize(new Dimension(280, 38));
-        field.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedLineBorder(BORDER, 8, 1),
-                new EmptyBorder(6, 12, 6, 12)));
+        field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
+        return field;
+    }
+
+    private JTextField createField(String memberId) {
+        JTextField field = new JTextField(memberId);
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        field.setForeground(TEXT);
+        field.setBackground(FIELD_BG);
+        field.setCaretColor(TEXT);
+        field.setPreferredSize(new Dimension(280, 38));
+        field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
         return field;
     }
 
