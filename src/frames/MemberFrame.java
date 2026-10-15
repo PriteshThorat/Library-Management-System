@@ -234,32 +234,30 @@ public class MemberFrame extends JFrame {
     }
 
     private void addMember() {
-        String memberId = memberIdField.getText().trim();
         String name = nameField.getText().trim();
         String email = emailField.getText().trim();
         String phone = phoneField.getText().trim();
 
-        if (memberId.isEmpty() || name.isEmpty()
-                || email.isEmpty() || phone.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "Please fill in all fields.");
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+
             return;
         }
 
         if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
-            JOptionPane.showMessageDialog(this,
-                    "Please enter a valid email address.");
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address.");
+
             return;
         }
 
         if (!phone.matches("\\d{10}")) {
-            JOptionPane.showMessageDialog(this,
-                    "Phone number must contain 10 digits.");
+            JOptionPane.showMessageDialog(this, "Phone number must contain 10 digits.");
+            
             return;
         }
 
         try {
-            if (MembersService.writeMembers(memberId, name, email, phone)) {
+            if (MembersService.writeMembers(name, email, phone)) {
                 loadMembers();
                 clearFields();
 

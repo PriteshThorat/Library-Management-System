@@ -5,6 +5,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import src.config.ConstantsConfig;
 import src.service.BooksService;
 
 import java.awt.*;
@@ -46,6 +47,7 @@ public class BookFrame {
   }
 
   private void initializeUI(JFrame frame) {
+    try {
       frame.setLayout(new BorderLayout());
 
       JPanel content = new JPanel(new BorderLayout(0, 20));
@@ -57,9 +59,12 @@ public class BookFrame {
       frame.add(new Header("Library Management System - Books"), BorderLayout.NORTH);
       frame.add(new Sidebar(frame, "Books"), BorderLayout.WEST);
       frame.add(content, BorderLayout.CENTER);
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
-  private JPanel createFormCard() {
+  private JPanel createFormCard() throws Exception {
       RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
       card.setLayout(new BorderLayout(0, 18));
       card.setBorder(new EmptyBorder(24, 28, 24, 28));
@@ -69,6 +74,7 @@ public class BookFrame {
       title.setForeground(TEXT);
       card.add(title, BorderLayout.NORTH);
 
+      bookIdField = createField(ConstantsConfig.getBookId());
       titleField = createField();
       authorField = createField();
       isbnField = createField();
@@ -80,6 +86,7 @@ public class BookFrame {
       GridBagConstraints gc = new GridBagConstraints();
       gc.insets = new Insets(8, 6, 8, 6);
 
+      addField(form, gc, 0, "Book ID:", bookIdField);
       addField(form, gc, 1, "Title:", titleField);
       addField(form, gc, 2, "Author:", authorField);
       addField(form, gc, 3, "ISBN:", isbnField);
@@ -223,16 +230,27 @@ public class BookFrame {
   }
 
   private JTextField createField() {
-      JTextField field = new JTextField();
-      field.setFont(new Font("Arial", Font.PLAIN, 14));
-      field.setForeground(TEXT);
-      field.setBackground(FIELD_BG);
-      field.setCaretColor(TEXT);
-      field.setPreferredSize(new Dimension(280, 38));
-      field.setBorder(BorderFactory.createCompoundBorder(
-          new RoundedLineBorder(BORDER, 8, 1),
-          new EmptyBorder(6, 12, 6, 12)));
-      return field;
+    JTextField field = new JTextField();
+    field.setFont(new Font("Arial", Font.PLAIN, 14));
+    field.setForeground(TEXT);
+    field.setBackground(FIELD_BG);
+    field.setCaretColor(TEXT);
+    field.setPreferredSize(new Dimension(280, 38));
+    field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
+    return field;
+  }
+
+  private JTextField createField(String bookId) {
+    JTextField field = new JTextField(bookId);
+    field.setFont(new Font("Arial", Font.PLAIN, 14));
+    field.setForeground(TEXT);
+    field.setBackground(FIELD_BG);
+    field.setCaretColor(TEXT);
+    field.setPreferredSize(new Dimension(280, 38));
+    field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
+    return field;
   }
 
   private void addBook(JFrame frame) {
@@ -358,6 +376,7 @@ public class BookFrame {
         return;
     }
 
+    bookIdField.setText(tableModel.getValueAt(selectedRow, 0).toString());
     titleField.setText(tableModel.getValueAt(selectedRow, 1).toString());
     authorField.setText(tableModel.getValueAt(selectedRow, 2).toString());
     isbnField.setText(tableModel.getValueAt(selectedRow, 3).toString());
@@ -365,6 +384,7 @@ public class BookFrame {
   }
 
   private void clearFields(JFrame frame) {
+    bookIdField.setText("");
     titleField.setText("");
     authorField.setText("");
     isbnField.setText("");

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
 class MemberIDAlreadyExistsException extends Exception {
@@ -40,10 +41,13 @@ public class MembersService {
     return membersCount;
   }
 
-  public static boolean writeMembers(String memberId, String name, String email, String phone) throws Exception {
+  public static boolean writeMembers(String name, String email, String phone) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename(), true);
 
-    fileWriter.append(memberId + ",");
+    fileWriter.append(ConstantsConfig.getMemberId() + ",");
+
+    ConstantsConfig.updateMemberId();
+
     fileWriter.append(name + ",");
     fileWriter.append(email + ",");
     fileWriter.append(phone + "\n");
