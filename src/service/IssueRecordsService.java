@@ -9,6 +9,12 @@ import java.util.Scanner;
 
 import src.config.EnvConfig;
 
+class IssueIDAlreadyExistsException extends Exception {
+  IssueIDAlreadyExistsException () {
+    super("Issue ID already exists.");
+  }
+}
+
 public class IssueRecordsService {
   public static int getAllIssueRecordsCount () throws Exception {
     File file = new File(EnvConfig.getIssueRecordsFilename());

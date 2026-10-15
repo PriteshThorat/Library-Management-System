@@ -6,7 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import src.config.ConstantsConfig;
 import src.config.EnvConfig;
+
+class BookIDAlreadyExistsException extends Exception {
+  BookIDAlreadyExistsException () {
+    super("Book ID already exists.");
+  }
+}
+
+class QuantityCannotBeNegative extends Exception {
+  QuantityCannotBeNegative () {
+    super("Quantity cannot be negative.");
+  }
+}
 
 public class BooksService {
   public static int getAllBooksCount () throws Exception {
@@ -63,7 +76,10 @@ public class BooksService {
   public static boolean writeBooks(String bookId, String title, String author, String isbn, String quantity) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
 
-    fileWriter.append(bookId + ",");
+    fileWriter.append(ConstantsConfig.getBookId() + ",");
+
+    ConstantsConfig.updateBookId();
+
     fileWriter.append(title + ",");
     fileWriter.append(author + ",");
     fileWriter.append(isbn + ",");
@@ -169,9 +185,3 @@ public class BooksService {
     }
   }
 }
-
-/*
-TODO: Exceptions 
-1. Book ID already exists.
-2. Quantity cannot be negative.
-*/

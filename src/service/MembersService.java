@@ -8,6 +8,12 @@ import java.util.Scanner;
 
 import src.config.EnvConfig;
 
+class MemberIDAlreadyExistsException extends Exception {
+  MemberIDAlreadyExistsException () {
+    super("Member ID already exists.");
+  }
+}
+
 public class MembersService {
   public static int getAllMembersCount () throws Exception {
     File file = new File(EnvConfig.getMembersFilename());

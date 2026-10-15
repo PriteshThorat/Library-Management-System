@@ -33,4 +33,8 @@ public class EnvConfig {
   public  static String getIssueRecordsFilename () throws Exception {
     return helper("DB_ISSUE_RECORDS_FILENAME");
   }
+
+  public static String getConstantsFilename () throws Exception {
+    return helper("CONSTANTS_FILE_NAME");
+  }
 }
