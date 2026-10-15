@@ -1,4 +1,5 @@
 *.env
 *.class
 *.csv
+constants.txt
 dist

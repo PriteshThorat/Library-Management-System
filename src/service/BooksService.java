@@ -73,7 +73,7 @@ public class BooksService {
     return books;
   }
 
-  public static boolean writeBooks(String bookId, String title, String author, String isbn, String quantity) throws Exception {
+  public static boolean writeBooks(String title, String author, String isbn, String quantity) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
 
     fileWriter.append(ConstantsConfig.getBookId() + ",");
