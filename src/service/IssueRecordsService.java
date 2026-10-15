@@ -183,7 +183,7 @@ public class IssueRecordsService {
       String line = issueBookDataData.nextLine();
       structuredData = line.split(",");
 
-      if (structuredData[0].contains(issuedId)) {
+      if (structuredData[0].equals(issuedId)) {
         updatedIssueBookData += structuredData[0];
         updatedIssueBookData += ",";
         updatedIssueBookData += structuredData[1];
@@ -202,10 +202,9 @@ public class IssueRecordsService {
       }
     }
     
-    FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename());
+    FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename());
     
     fileWriter.write(updatedIssueBookData);
-    fileWriter.write("\n");
 
     issueBookDataData.close();
     fileWriter.close();

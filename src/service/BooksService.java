@@ -128,7 +128,6 @@ public class BooksService {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename());
     
     fileWriter.write(updatedBookData);
-    fileWriter.write("\n");
 
     bookData.close();
     fileWriter.close();
