@@ -6,12 +6,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
 class MemberIDAlreadyExistsException extends Exception {
   MemberIDAlreadyExistsException () {
     super("Member ID already exists.");
+  }
+}
+
+class PleaseFillInAllFieldsException extends Exception {
+  PleaseFillInAllFieldsException () {
+    super("Please fill in all fields.");
+  }
+}
+
+class PleaseEnterAValidEmailAddressException extends Exception {
+  PleaseEnterAValidEmailAddressException () {
+    super("Please enter a valid email address.");
+  }
+}
+
+class PhoneNumberMustContain10DigitsException extends Exception {
+  PhoneNumberMustContain10DigitsException () {
+    super("Phone number must contain 10 digits.");
   }
 }
 
@@ -41,7 +61,19 @@ public class MembersService {
     return membersCount;
   }
 
-  public static boolean writeMembers(String name, String email, String phone) throws Exception {
+  public static boolean writeMembers (String name, String email, String phone) throws Exception {
+    if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+      throw new PleaseFillInAllFieldsException();
+    }
+
+    if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+      throw new PleaseEnterAValidEmailAddressException();
+    }
+
+    if (!phone.matches("\\d{10}")) {
+      throw new PhoneNumberMustContain10DigitsException();
+    }
+
     FileWriter fileWriter = new FileWriter(EnvConfig.getMembersFilename(), true);
 
     fileWriter.append(ConstantsConfig.getMemberId() + ",");
