@@ -10,12 +10,7 @@ import java.util.Scanner;
 
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
-
-class PleaseFillInAllFieldsException extends Exception {
-  PleaseFillInAllFieldsException () {
-    super("Please fill in all fields.");
-  }
-}
+import src.service.PleaseFillInAllFieldsException;
 
 class DatesMustUseYYYYMMDDFormatException extends Exception {
   DatesMustUseYYYYMMDDFormatException () {
@@ -24,7 +19,7 @@ class DatesMustUseYYYYMMDDFormatException extends Exception {
 }
 
 class DueDateCannotBeBeforeIssueDateException extends Exception {
-  DueDateCannotBeBeforeIssueDate () {
+  DueDateCannotBeBeforeIssueDateException () {
     super("Due date cannot be before issue date.");
   }
 }
@@ -35,15 +30,15 @@ class IssueSavedButBookQuantityCouldNotBeUpdatedException extends Exception {
   }
 }
 
-class InvalidBookIdIsPassed extends Exception {
-  InvalidBookIdIsPassed () {
-    super("Invalid Book Id is Passed.")
+class InvalidBookIdIsPassedException extends Exception {
+  InvalidBookIdIsPassedException () {
+    super("Invalid Book Id is Passed.");
   }
 }
 
-class InvalidMemberIdIsPassed extends Exception {
-  InvalidBookIdIsPassed () {
-    super("Invalid Member Id is Passed.")
+class InvalidMemberIdIsPassedException extends Exception {
+  InvalidMemberIdIsPassedException () {
+    super("Invalid Member Id is Passed.");
   }
 }
 
@@ -52,13 +47,13 @@ public class IssueRecordsService {
     File file = new File(EnvConfig.getBooksFilename());
 
     Scanner issuedBookData = new Scanner(file);
-    String structuredData;
+    String structuredData[];
 
     while (issuedBookData.hasNextLine()) {
       structuredData = issuedBookData.nextLine().split(",");
 
       if (structuredData[0].equals(bookId)) {
-        return true
+        return true;
       }
     }
 
@@ -69,13 +64,13 @@ public class IssueRecordsService {
     File file = new File(EnvConfig.getMembersFilename());
 
     Scanner issuedMemberData = new Scanner(file);
-    String structuredData;
+    String structuredData[];
 
     while (issuedMemberData.hasNextLine()) {
       structuredData = issuedMemberData.nextLine().split(",");
 
       if (structuredData[0].equals(memberId)) {
-        return true
+        return true;
       }
     }
 
@@ -146,22 +141,22 @@ public class IssueRecordsService {
     }
 
     try {
-      LocalDate.parse(issueDate);
-      LocalDate.parse(dueDate);
+      LocalDate issueDateInLocalDate = LocalDate.parse(issueDate);
+      LocalDate dueDateInLocalDate = LocalDate.parse(dueDate);
+
+      if (dueDateInLocalDate.isBefore(issueDateInLocalDate)) {
+        throw new DueDateCannotBeBeforeIssueDateException();
+      }
     } catch (DateTimeParseException ex) {
       throw new DatesMustUseYYYYMMDDFormatException();
     }
 
-    if (dueDate.isBefore(issueDate)) {
-      throw new DueDateCannotBeBeforeIssueDateException();
-    }
-
     if (!isValidBookId(bookId)) {
-      throw new InvalidBookIdIsPassed();
+      throw new InvalidBookIdIsPassedException();
     }
 
     if (!isValidMemberId(memberId)) {
-      throw new InvalidMemberIdIsPassed();
+      throw new InvalidMemberIdIsPassedException();
     }
 
     FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename(), true);
@@ -173,7 +168,8 @@ public class IssueRecordsService {
     fileWriter.append(bookId + ",");
     fileWriter.append(memberId + ",");
     fileWriter.append(issueDate + ",");
-    fileWriter.append(dueDate + "\n");
+    fileWriter.append(dueDate + ",");
+    fileWriter.append("Not_Returned" + "\n");
 
     fileWriter.close();
 
@@ -202,11 +198,13 @@ public class IssueRecordsService {
         updatedBookData += ",";
 
         if (structuredData[4].equals("1")) {
-          throw new IssueSavedButBookQuantityCouldNotBeUpdatedException();
+          try {
+            throw new IssueSavedButBookQuantityCouldNotBeUpdatedException();
+          } finally {
+            bookData.close();
 
-          bookData.close();
-
-          return false;
+            return false;
+          }
         }
 
         int newQuantity = Integer.parseInt(structuredData[4]) - 1;

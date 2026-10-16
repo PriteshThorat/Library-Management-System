@@ -266,7 +266,7 @@ public class IssueReturnFrame extends JFrame {
         String dueDate = dueDateField.getText().trim();
 
         try {
-            if (IssueRecordsService.issueBooks(bookId, memberId, issueDate, dueDate, "Not_Returned")) {
+            if (IssueRecordsService.issueBooks(bookId, memberId, issueDate, dueDate)) {
                 if (!IssueRecordsService.updateBookQuantity(bookId)) {
                     loadIssues();
 
@@ -280,7 +280,7 @@ public class IssueReturnFrame extends JFrame {
         } catch (Exception e) {
             System.out.println(e);
 
-            showMessage(e);
+            showMessage(e.getMessage());
         }
     }
 

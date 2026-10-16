@@ -10,6 +10,7 @@ import javax.swing.JOptionPane;
 
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
+import src.service.PleaseFillInAllFieldsException;;
 
 class QuantityCannotBeNegativeException extends Exception {
   QuantityCannotBeNegativeException () {
@@ -20,12 +21,6 @@ class QuantityCannotBeNegativeException extends Exception {
 class QuantityMustBeAValidIntegerException extends Exception {
   QuantityMustBeAValidIntegerException () {
     super("Quantity must be a valid integer");
-  }
-}
-
-class PleaseFillInAllFieldsException extends Exception {
-  PleaseFillInAllFieldsException () {
-    super("Please fill in all fields.");
   }
 }
 
