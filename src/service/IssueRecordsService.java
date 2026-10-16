@@ -35,7 +35,53 @@ class IssueSavedButBookQuantityCouldNotBeUpdatedException extends Exception {
   }
 }
 
+class InvalidBookIdIsPassed extends Exception {
+  InvalidBookIdIsPassed () {
+    super("Invalid Book Id is Passed.")
+  }
+}
+
+class InvalidMemberIdIsPassed extends Exception {
+  InvalidBookIdIsPassed () {
+    super("Invalid Member Id is Passed.")
+  }
+}
+
 public class IssueRecordsService {
+  private static boolean isValidBookId (String bookId) throws Exception {
+    File file = new File(EnvConfig.getBooksFilename());
+
+    Scanner issuedBookData = new Scanner(file);
+    String structuredData;
+
+    while (issuedBookData.hasNextLine()) {
+      structuredData = issuedBookData.nextLine().split(",");
+
+      if (structuredData[0].equals(bookId)) {
+        return true
+      }
+    }
+
+    return false;
+  }
+
+  private static boolean isValidMemberId (String memberId) throws Exception {
+    File file = new File(EnvConfig.getMembersFilename());
+
+    Scanner issuedMemberData = new Scanner(file);
+    String structuredData;
+
+    while (issuedMemberData.hasNextLine()) {
+      structuredData = issuedMemberData.nextLine().split(",");
+
+      if (structuredData[0].equals(memberId)) {
+        return true
+      }
+    }
+
+    return false;
+  }
+
   public static int getAllIssueRecordsCount () throws Exception {
     File file = new File(EnvConfig.getIssueRecordsFilename());
 
@@ -108,6 +154,14 @@ public class IssueRecordsService {
 
     if (dueDate.isBefore(issueDate)) {
       throw new DueDateCannotBeBeforeIssueDateException();
+    }
+
+    if (!isValidBookId(bookId)) {
+      throw new InvalidBookIdIsPassed();
+    }
+
+    if (!isValidMemberId(memberId)) {
+      throw new InvalidMemberIdIsPassed();
     }
 
     FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename(), true);
