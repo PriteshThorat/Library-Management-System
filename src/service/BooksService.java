@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.swing.JOptionPane;
+
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
@@ -24,6 +26,12 @@ class QuantityCannotBeNegativeException extends Exception {
 class QuantityMustBeAValidIntegerException extends Exception {
   QuantityMustBeAValidIntegerException () {
     super("Quantity must be a valid integer");
+  }
+}
+
+class PleaseFillInAllFieldsException extends Exception {
+  PleaseFillInAllFieldsException () {
+    super("Please fill in all fields.");
   }
 }
 
@@ -80,7 +88,9 @@ public class BooksService {
   }
 
   public static boolean writeBooks(String title, String author, String isbn, String quantity) throws Exception {
-    FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
+    if (title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantity.isEmpty()) {
+      throw new PleaseFillInAllFieldsException();
+    }
 
     try {
       int quantityInInt = Integer.parseInt(quantity);
@@ -91,6 +101,8 @@ public class BooksService {
     } catch (NumberFormatException e) {
       throw new QuantityMustBeAValidIntegerException();
     }
+
+    FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
 
     fileWriter.append(ConstantsConfig.getBookId() + ",");
 
@@ -132,6 +144,20 @@ public class BooksService {
   }
 
   public static boolean updateBook(String bookId, String title, String author, String isbn, String quantity) throws Exception {
+    if (title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantity.isEmpty()) {
+      throw new PleaseFillInAllFieldsException();
+    }
+
+    try {
+      int quantityInInt = Integer.parseInt(quantity);
+
+      if (quantityInInt < 0) {
+        throw new QuantityCannotBeNegativeException();
+      }
+    } catch (NumberFormatException e) {
+      throw new QuantityMustBeAValidIntegerException();
+    }
+
     File file = new File(EnvConfig.getBooksFilename());
 
     Scanner bookData = new Scanner(file);

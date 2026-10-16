@@ -259,24 +259,18 @@ public class BookFrame {
     String isbn = isbnField.getText().trim();
     String quantity = quantityField.getText().trim();
 
-    if (title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantity.isEmpty()) {
-      JOptionPane.showMessageDialog(frame, "Please fill in all fields.");
+    try {
+      if (BooksService.writeBooks(title, author, isbn, String.valueOf(quantity))) {
+        loadBooks(frame);
+        clearFields(frame);
 
-      return;
-    }
-
-      try {
-        if (BooksService.writeBooks(title, author, isbn, String.valueOf(quantity))) {
-          loadBooks(frame);
-          clearFields(frame);
-
-          JOptionPane.showMessageDialog(frame,  "Book added successfully.");
-        }
-      } catch (Exception e) {
-        System.out.println(e);
-
-        JOptionPane.showMessageDialog(frame, e.getMessage());
+        JOptionPane.showMessageDialog(frame,  "Book added successfully.");
       }
+    } catch (Exception e) {
+      System.out.println(e);
+
+      JOptionPane.showMessageDialog(frame, e.getMessage());
+    }
   }
 
   private void updateBook(JFrame frame) {
@@ -292,32 +286,10 @@ public class BookFrame {
     String title = titleField.getText().trim();
     String author = authorField.getText().trim();
     String isbn = isbnField.getText().trim();
-    String quantityText = quantityField.getText().trim();
-
-    if (bookId.isEmpty() || title.isEmpty() || author.isEmpty() || isbn.isEmpty() || quantityText.isEmpty()) {
-      JOptionPane.showMessageDialog(frame,  "Please fill in all fields.");
-
-      return;
-    }
-
-    int quantity;
+    String quantity = quantityField.getText().trim();
 
     try {
-      quantity = Integer.parseInt(quantityText);
-
-      if (quantity < 0) {
-        JOptionPane.showMessageDialog(frame,  "Quantity cannot be negative.");
-
-        return;
-      }
-    } catch (NumberFormatException ex) {
-      JOptionPane.showMessageDialog(frame,  "Quantity must be a valid integer.");
-
-      return;
-    }
-
-    try {
-      if (BooksService.updateBook(bookId, title, author, isbn, String.valueOf(quantity))) {
+      if (BooksService.updateBook(bookId, title, author, isbn, quantity)) {
         loadBooks(frame);
         clearFields(frame);
 
@@ -325,6 +297,8 @@ public class BookFrame {
       }
     } catch (Exception e) {
       System.out.println(e);
+
+      JOptionPane.showMessageDialog(frame,  e.getMessage());
     }
   }
 
