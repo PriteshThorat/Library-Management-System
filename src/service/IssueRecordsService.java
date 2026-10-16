@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
 class IssueIDAlreadyExistsException extends Exception {
@@ -74,14 +75,17 @@ public class IssueRecordsService {
     return overdueRecordsCount;
   }
 
-  public static boolean issueBooks(List<String[]> issues) throws Exception {
+  public static boolean issueBooks(String issueId, String bookId, String memberId, String issueDate, String dueDate) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename(), true);
 
-    for (String[] issue : issues) {
-      fileWriter.append(String.join(",", issue));
-    }
+    fileWriter.append(ConstantsConfig.getIssueId() + ",");
 
-    fileWriter.append("\n");
+    ConstantsConfig.updateIssueId();
+
+    fileWriter.append(bookId + ",");
+    fileWriter.append(memberId + ",");
+    fileWriter.append(issueDate + ",");
+    fileWriter.append(dueDate + "\n");
 
     fileWriter.close();
 

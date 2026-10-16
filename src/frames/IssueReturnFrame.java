@@ -5,6 +5,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import src.config.ConstantsConfig;
 import src.service.IssueRecordsService;
 
 import java.awt.*;
@@ -49,20 +50,24 @@ public class IssueReturnFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setLayout(new BorderLayout());
+        try {
+            setLayout(new BorderLayout());
 
-        JPanel content = new JPanel(new BorderLayout(0, 20));
-        content.setBackground(CONTENT_BG);
-        content.setBorder(new EmptyBorder(24, 30, 28, 30));
-        content.add(createFormCard(), BorderLayout.NORTH);
-        content.add(createTableCard(), BorderLayout.CENTER);
+            JPanel content = new JPanel(new BorderLayout(0, 20));
+            content.setBackground(CONTENT_BG);
+            content.setBorder(new EmptyBorder(24, 30, 28, 30));
+            content.add(createFormCard(), BorderLayout.NORTH);
+            content.add(createTableCard(), BorderLayout.CENTER);
 
-        add(new Header("Library Management System - Issue / Return"), BorderLayout.NORTH);
-        add(new Sidebar(this, "Issue / Return"), BorderLayout.WEST);
-        add(content, BorderLayout.CENTER);
+            add(new Header("Library Management System - Issue / Return"), BorderLayout.NORTH);
+            add(new Sidebar(this, "Issue / Return"), BorderLayout.WEST);
+            add(content, BorderLayout.CENTER);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
-    private JPanel createFormCard() {
+    private JPanel createFormCard() throws Exception {
         RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
         card.setLayout(new BorderLayout(0, 18));
         card.setBorder(new EmptyBorder(24, 28, 24, 28));
@@ -72,7 +77,7 @@ public class IssueReturnFrame extends JFrame {
         title.setForeground(TEXT);
         card.add(title, BorderLayout.NORTH);
 
-        issueIdField = createField();
+        issueIdField = createField(ConstantsConfig.getIssueId());
         bookIdField = createField();
         memberIdField = createField();
         issueDateField = createField();
@@ -237,9 +242,20 @@ public class IssueReturnFrame extends JFrame {
         field.setBackground(FIELD_BG);
         field.setCaretColor(TEXT);
         field.setPreferredSize(new Dimension(320, 38));
-        field.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedLineBorder(BORDER, 8, 1),
-                new EmptyBorder(6, 12, 6, 12)));
+        field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
+        return field;
+    }
+
+    private JTextField createField(String issueId) {
+        JTextField field = new JTextField(issueId);
+        field.setFont(new Font("Arial", Font.PLAIN, 14));
+        field.setForeground(TEXT);
+        field.setBackground(FIELD_BG);
+        field.setCaretColor(TEXT);
+        field.setPreferredSize(new Dimension(320, 38));
+        field.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+
         return field;
     }
 
@@ -274,19 +290,8 @@ public class IssueReturnFrame extends JFrame {
         }
 
         try {
-            List<String[]> issues = new ArrayList<>();
-
-            issues.add(new String[] {
-                    issueId,
-                    bookId,
-                    memberId,
-                    issueDate.toString(),
-                    dueDate.toString(),
-                    "Not_Returned"
-            });
-
             try {
-                if (IssueRecordsService.issueBooks(issues)) {
+                if (IssueRecordsService.issueBooks(bookId, memberId, issueDate.toString(), dueDate.toString(), "Not_Returned")) {
                     if (!IssueRecordsService.updateBookQuantity(bookId)) {
                         showMessage("Issue saved, but book quantity could not be updated. "
                                 + "Check books.csv before issuing another copy.");
