@@ -260,57 +260,27 @@ public class IssueReturnFrame extends JFrame {
     }
 
     private void issueBook() {
-        String issueId = issueIdField.getText().trim();
         String bookId = bookIdField.getText().trim();
         String memberId = memberIdField.getText().trim();
-        String issueDateText = issueDateField.getText().trim();
-        String dueDateText = dueDateField.getText().trim();
-
-        if (issueId.isEmpty() || bookId.isEmpty()
-                || memberId.isEmpty() || issueDateText.isEmpty()
-                || dueDateText.isEmpty()) {
-            showMessage("Please fill in all fields.");
-            return;
-        }
-
-        LocalDate issueDate;
-        LocalDate dueDate;
+        String issueDate = issueDateField.getText().trim();
+        String dueDate = dueDateField.getText().trim();
 
         try {
-            issueDate = LocalDate.parse(issueDateText);
-            dueDate = LocalDate.parse(dueDateText);
-        } catch (DateTimeParseException ex) {
-            showMessage("Dates must use YYYY-MM-DD format.");
-            return;
-        }
-
-        if (dueDate.isBefore(issueDate)) {
-            showMessage("Due date cannot be before issue date.");
-            return;
-        }
-
-        try {
-            try {
-                if (IssueRecordsService.issueBooks(bookId, memberId, issueDate.toString(), dueDate.toString(), "Not_Returned")) {
-                    if (!IssueRecordsService.updateBookQuantity(bookId)) {
-                        showMessage("Issue saved, but book quantity could not be updated. "
-                                + "Check books.csv before issuing another copy.");
-
-                        loadIssues();
-
-                        return;
-                    }
-
+            if (IssueRecordsService.issueBooks(bookId, memberId, issueDate, dueDate, "Not_Returned")) {
+                if (!IssueRecordsService.updateBookQuantity(bookId)) {
                     loadIssues();
-                    clearFields();
-                    showMessage("Book issued successfully.");
-                }
-            } catch (Exception e) {
-                System.out.println(e);
-            }
 
+                    return;
+                }
+
+                loadIssues();
+                clearFields();
+                showMessage("Book issued successfully.");
+            }
         } catch (Exception e) {
             System.out.println(e);
+
+            showMessage(e);
         }
     }
 

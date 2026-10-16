@@ -3,6 +3,7 @@ package src.service;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,6 +14,30 @@ import src.config.EnvConfig;
 class IssueIDAlreadyExistsException extends Exception {
   IssueIDAlreadyExistsException () {
     super("Issue ID already exists.");
+  }
+}
+
+class PleaseFillInAllFieldsException extends Exception {
+  PleaseFillInAllFieldsException () {
+    super("Please fill in all fields.");
+  }
+}
+
+class DatesMustUseYYYYMMDDFormatException extends Exception {
+  DatesMustUseYYYYMMDDFormatException () {
+    super("Dates must use YYYY-MM-DD format.");
+  }
+}
+
+class DueDateCannotBeBeforeIssueDateException extends Exception {
+  DueDateCannotBeBeforeIssueDate () {
+    super("Due date cannot be before issue date.");
+  }
+}
+
+class IssueSavedButBookQuantityCouldNotBeUpdatedException extends Exception {
+  IssueSavedButBookQuantityCouldNotBeUpdatedException () {
+    super("Issue saved, but book quantity could not be updated.");
   }
 }
 
@@ -75,7 +100,22 @@ public class IssueRecordsService {
     return overdueRecordsCount;
   }
 
-  public static boolean issueBooks(String issueId, String bookId, String memberId, String issueDate, String dueDate) throws Exception {
+  public static boolean issueBooks(String bookId, String memberId, String issueDate, String dueDate) throws Exception {
+    if (bookId.isEmpty() || memberId.isEmpty() || issueDate.isEmpty() || dueDate.isEmpty()) {
+      throw new PleaseFillInAllFieldsException();
+    }
+
+    try {
+      LocalDate.parse(issueDate);
+      LocalDate.parse(dueDate);
+    } catch (DateTimeParseException ex) {
+      throw new DatesMustUseYYYYMMDDFormatException();
+    }
+
+    if (dueDate.isBefore(issueDate)) {
+      throw new DueDateCannotBeBeforeIssueDateException();
+    }
+
     FileWriter fileWriter = new FileWriter(EnvConfig.getIssueRecordsFilename(), true);
 
     fileWriter.append(ConstantsConfig.getIssueId() + ",");
@@ -114,6 +154,8 @@ public class IssueRecordsService {
         updatedBookData += ",";
 
         if (structuredData[4].equals("1")) {
+          throw new IssueSavedButBookQuantityCouldNotBeUpdatedException();
+
           bookData.close();
 
           return false;
