@@ -6,7 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
 import src.config.ConstantsConfig;
+import src.service.BooksService;
 import src.service.IssueRecordsService;
+import src.service.MembersService;
 
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
@@ -35,8 +37,8 @@ public class IssueReturnFrame extends JFrame {
     private static final Color GRAY = new Color(108, 117, 125);
 
     private JTextField issueIdField;
-    private JTextField bookIdField;
-    private JTextField memberIdField;
+    private JComboBox<Choice> bookIdCombo;
+    private JComboBox<Choice> memberIdCombo;
     private JDateChooser issueDateChooser;
     private JDateChooser dueDateChooser;
     private JTextField searchField;
@@ -84,8 +86,9 @@ public class IssueReturnFrame extends JFrame {
         card.add(title, BorderLayout.NORTH);
 
         issueIdField = createField(ConstantsConfig.getIssueId());
-        bookIdField = createField();
-        memberIdField = createField();
+        bookIdCombo = createChoiceCombo("Select book...");
+        memberIdCombo = createChoiceCombo("Select member...");
+        loadChoices();
         issueDateChooser = createDateChooser(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
         dueDateChooser = createDateChooser(Date.from(LocalDate.now().plusDays(14).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
@@ -96,8 +99,8 @@ public class IssueReturnFrame extends JFrame {
         gc.insets = new Insets(8, 6, 8, 6);
 
         addSpinnerField(form, gc, 0, "Issue ID:", issueIdField);
-        addSpinnerField(form, gc, 1, "Book ID:", bookIdField);
-        addSpinnerField(form, gc, 2, "Member ID:", memberIdField);
+        addSpinnerField(form, gc, 1, "Book ID:", bookIdCombo);
+        addSpinnerField(form, gc, 2, "Member ID:", memberIdCombo);
         addSpinnerField(form, gc, 3, "Issue Date:", issueDateChooser);
         addSpinnerField(form, gc, 4, "Due Date:", dueDateChooser);
 
@@ -124,7 +127,10 @@ public class IssueReturnFrame extends JFrame {
         issueButton.addActionListener(e -> issueBook());
         returnButton.addActionListener(e -> returnBook());
         clearButton.addActionListener(e -> clearFields());
-        refreshButton.addActionListener(e -> loadIssues());
+        refreshButton.addActionListener(e -> {
+            loadChoices();
+            loadIssues();
+        });
 
         return card;
     }
@@ -308,9 +314,84 @@ public class IssueReturnFrame extends JFrame {
         return field;
     }
 
+    private JComboBox<Choice> createChoiceCombo(String placeholder) {
+        JComboBox<Choice> combo = new JComboBox<>();
+        combo.setFont(new Font("Arial", Font.PLAIN, 14));
+        combo.setForeground(TEXT);
+        combo.setBackground(FIELD_BG);
+        combo.setPreferredSize(new Dimension(320, 38));
+        combo.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+        combo.addItem(new Choice("", placeholder));
+
+        combo.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(new Font("Arial", Font.PLAIN, 14));
+                label.setBorder(new EmptyBorder(6, 12, 6, 12));
+                label.setOpaque(true);
+
+                if (isSelected) {
+                    label.setBackground(new Color(232, 240, 254));
+                    label.setForeground(TEXT);
+                } else {
+                    label.setBackground(index == 0 ? FIELD_BG : Color.WHITE);
+                    label.setForeground(value instanceof Choice && ((Choice) value).id.isEmpty() ? MUTED : TEXT);
+                }
+
+                return label;
+            }
+        });
+
+        return combo;
+    }
+
+    private void loadChoices() {
+        try {
+            String selectedBookId = getSelectedId(bookIdCombo);
+            bookIdCombo.removeAllItems();
+            bookIdCombo.addItem(new Choice("", "Select book..."));
+            for (String[] book : BooksService.readBooks()) {
+                if (book.length < 2) continue;
+                bookIdCombo.addItem(new Choice(book[0].trim(), book[0].trim() + " - " + book[1].trim()));
+            }
+            selectById(bookIdCombo, selectedBookId);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        try {
+            String selectedMemberId = getSelectedId(memberIdCombo);
+            memberIdCombo.removeAllItems();
+            memberIdCombo.addItem(new Choice("", "Select member..."));
+            for (String[] member : MembersService.readMembers()) {
+                if (member.length < 2) continue;
+                memberIdCombo.addItem(new Choice(member[0].trim(), member[0].trim() + " - " + member[1].trim()));
+            }
+            selectById(memberIdCombo, selectedMemberId);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    private String getSelectedId(JComboBox<Choice> combo) {
+        Choice choice = (Choice) combo.getSelectedItem();
+        return choice == null ? "" : choice.id;
+    }
+
+    private void selectById(JComboBox<Choice> combo, String id) {
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            if (combo.getItemAt(i).id.equals(id)) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+        combo.setSelectedIndex(0);
+    }
+
     private void issueBook() {
-        String bookId = bookIdField.getText().trim();
-        String memberId = memberIdField.getText().trim();
+        String bookId = getSelectedId(bookIdCombo);
+        String memberId = getSelectedId(memberIdCombo);
         String issueDate = getDateFromChooser(issueDateChooser);
         String dueDate = getDateFromChooser(dueDateChooser);
 
@@ -411,9 +492,9 @@ public class IssueReturnFrame extends JFrame {
 
         issueIdField.setText(
                 tableModel.getValueAt(row, 0).toString());
-        bookIdField.setText(
+        selectById(bookIdCombo,
                 tableModel.getValueAt(row, 1).toString());
-        memberIdField.setText(
+        selectById(memberIdCombo,
                 tableModel.getValueAt(row, 2).toString());
         setDateInChooser(issueDateChooser,
                 tableModel.getValueAt(row, 3).toString());
@@ -423,8 +504,8 @@ public class IssueReturnFrame extends JFrame {
 
     private void clearFields() {
         issueIdField.setText("");
-        bookIdField.setText("");
-        memberIdField.setText("");
+        selectById(bookIdCombo, "");
+        selectById(memberIdCombo, "");
         setDateInChooser(issueDateChooser, LocalDate.now().toString());
         setDateInChooser(dueDateChooser, LocalDate.now().plusDays(14).toString());
         searchField.setText("");
@@ -433,6 +514,21 @@ public class IssueReturnFrame extends JFrame {
 
     private void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    private static class Choice {
+        final String id;
+        final String label;
+
+        Choice(String id, String label) {
+            this.id = id;
+            this.label = label;
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     private static class RoundedPanel extends JPanel {
