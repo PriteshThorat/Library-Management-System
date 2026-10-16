@@ -1,7 +1,8 @@
-# Library-Management-System
+# Library Management System
 
-A desktop **Library Management System** built with **Java Swing** (no external
-dependencies). It manages books, members, and book issue/return records using
+A desktop **Library Management System** built with **Java Swing** (a single
+bundled date-picker jar is the only dependency). It manages books, members, and
+book issue/return records using
 plain **CSV files** as the data store, with a modern custom-drawn UI (sidebar
 navigation, dashboard cards, rounded buttons and fields).
 
@@ -50,7 +51,8 @@ The code follows a light three-layer separation:
                │ uses
 ┌──────────────▼──────────────┐
 │  config/  (config layer)    │  EnvConfig (.env reader),
-│                             │  FileCreation (bootstraps CSV files)
+│                             │  FileCreation (bootstraps CSV files),
+│                             │  ConstantsConfig (auto-increment IDs)
 └──────────────┬──────────────┘
                │ stores in
 ┌──────────────▼──────────────┐
@@ -74,10 +76,13 @@ The code follows a light three-layer separation:
   Member IDs are unique.
 - Dates are `YYYY-MM-DD`; the default loan period is **14 days**, and a record
   past its due date while still borrowed is **Overdue**.
+- Book, Member and Issue IDs are **generated automatically** (prefix `B` / `M`
+  / `I`) from counters kept in `constants.txt`.
 
 **Design goals / scope**
 
-- **Zero external dependencies** – only the standard JDK.
+- **Minimal dependencies** – the standard JDK plus a single bundled date-picker
+  jar (`lib/jcalendar-1.4.jar`).
 - **Portable and transparent storage** – CSVs you can open in any editor.
 - **Custom-drawn, modern look** – rounded panels/buttons/fields and vector
   icons painted in code rather than image assets.
@@ -105,17 +110,20 @@ The code follows a light three-layer separation:
 
 ## Tech Stack
 
-| Item        | Detail                                        |
-| ----------- | --------------------------------------------- |
-| Language    | Java                                          |
-| UI          | Java Swing / AWT (custom painted components)  |
-| Storage     | CSV files (via `java.io` + `Scanner`/`FileWriter`) |
-| Config      | `.env` file loaded with `java.util.Properties` |
-| Build       | `javac` (plain JDK, no Maven/Gradle)          |
-| Tested with | JDK 26 (`java 26.0.2.1`)                       |
+| Item         | Detail                                        |
+| ------------ | --------------------------------------------- |
+| Language     | Java                                          |
+| UI           | Java Swing / AWT (custom painted components)  |
+| Date picker  | [JCalendar](https://toedter.com/jcalendar/) 1.4 (`lib/jcalendar-1.4.jar`), used by the Issue/Return screen |
+| Storage      | CSV files (via `java.io` + `Scanner`/`FileWriter`) |
+| Config       | `.env` file loaded with `java.util.Properties` |
+| Build        | `javac` (plain JDK, no Maven/Gradle)          |
+| Tested with  | JDK 26 (`java 26.0.2.1`)                       |
 
-The `lib/` folder is on the classpath for future external `.jar` dependencies;
-the project currently has none.
+`lib/jcalendar-1.4.jar` is the only external dependency. It provides the
+`com.toedter.calendar.JDateChooser` component used on the Issue/Return screen;
+everything else uses the standard JDK. Any further `.jar` files dropped into
+`lib/` are picked up automatically because the whole folder is on the classpath.
 
 ---
 
@@ -139,13 +147,14 @@ javac -version
 Library-Management-System/
 ├── .env                         # local credentials + CSV filenames (NOT committed)
 ├── env.txt                      # template for .env
-├── lib/                         # third-party jars (currently empty, on classpath)
+├── lib/                         # external jars, on classpath (jcalendar-1.4.jar)
 ├── bin/                         # compiled .class output
 ├── src/
 │   ├── Main.java                # entry point (package src)
 │   ├── config/
 │   │   ├── EnvConfig.java       # reads values from .env
-│   │   └── FileCreation.java    # creates CSV files + headers if missing
+│   │   ├── FileCreation.java    # creates CSV files + headers if missing
+│   │   └── ConstantsConfig.java # read/update auto-increment ID counters
 │   ├── frames/
 │   │   ├── LoginFrame.java      # login screen
 │   │   ├── DashboardFrame.java  # dashboard with stat cards
@@ -154,18 +163,17 @@ Library-Management-System/
 │   │   ├── IssueReturnFrame.java# issue / return books
 │   │   ├── Header.java          # top header bar
 │   │   ├── Sidebar.java         # left navigation
-│   │   └── AppIcon.java         # custom-drawn icons
+│   │   ├── AppIcon.java         # custom-drawn icons
+│   │   └── BookIcon.java        # custom-drawn book icon
 │   └── service/
 │       ├── BooksService.java        # book data access
 │       ├── MembersService.java      # member data access
 │       └── IssueRecordsService.java # issue/return data access
 ├── books_database.csv           # books data (created at runtime)
 ├── members_database.csv         # members data (created at runtime)
-└── issue_records_database.csv   # issue records (created at runtime)
+├── issue_records_database.csv   # issue records (created at runtime)
+└── constants.txt                # auto-increment ID counters (created/updated at runtime)
 ```
-
-> `init/` and `Test/` contain early prototypes / scratch files and are not part
-> of the application.
 
 ---
 
@@ -187,14 +195,44 @@ Library-Management-System/
    DB_BOOKS_FILENAME=books_database.csv
    DB_MEMBERS_FILENAME=members_database.csv
    DB_ISSUE_RECORDS_FILENAME=issue_records_database.csv
+   CONSTANTS_FILE_NAME=constants.txt
    ```
 
    - `DB_USERNAME` / `DB_PASSWORD` are the **login credentials** for the app.
    - The `DB_*_FILENAME` values are the CSV files used for storage. They are
      **created automatically** on first run (with headers) if they do not exist.
+   - `CONSTANTS_FILE_NAME` points to the auto-increment ID counter file.
+     `env.txt` does not list it, so add this line when you copy the template.
 
-3. Make sure `lib/` exists (it can be empty) and that the `.csv` files are in the
-   **working directory** from which you run the app.
+3. **Create the `constants.txt` file** in the project root with the starting
+   counter for each auto-generated ID. This file is **required** — the app reads
+   it at startup and updates the values in place as records are added, but it
+   will **not** create it for you (unlike the CSVs):
+
+   ```properties
+   BOOK_ID=0
+   MEMBER_ID=0
+   ISSUE_ID=0
+   ```
+
+   - Each value is the **next numeric part** of the ID. The letters `B`, `M` and
+     `I` are prepended automatically, so `BOOK_ID=102` produces `B102`.
+   - Start at `0` for a fresh library, or bump the numbers to continue from an
+     existing set of records.
+
+4. **Add the `lib/jcalendar-1.4.jar` dependency.** The date-picker jar lives in
+   the `lib/` folder and is required to compile and run (the Issue/Return screen
+   uses `JDateChooser`). If it is missing, download
+   [JCalendar 1.4](https://toedter.com/jcalendar/) and place the jar there:
+
+   ```
+   Library-Management-System/
+   └── lib/
+       └── jcalendar-1.4.jar
+   ```
+
+5. Make sure the `.csv` files are in the **working directory** from which you run
+   the app (they are created automatically on first run).
 
 ---
 
@@ -220,12 +258,43 @@ Password: adminpass
 - Dates use `YYYY-MM-DD`. Due date defaults to **issue date + 14 days**.
 - An unreturned record stores `Not_Returned` in the `return_date` column.
 
+`constants.txt` holds the next numeric part for each auto-generated ID
+(loaded/saved via `java.util.Properties`):
+
+```properties
+BOOK_ID=102
+ISSUE_ID=100
+MEMBER_ID=100
+```
+
 ---
 
 ## Build & Run
 
 All commands are run from the **project root** (the folder containing `src/`,
 `lib/` and `.env`).
+
+### Compile with the JCalendar jar, then run
+
+This is the most direct way to build every source file (all of `config`,
+`service` and `frames`) with the date-picker jar on the classpath, then launch
+the app:
+
+```powershell
+javac -cp "bin;lib\jcalendar-1.4.jar" -d bin src\Main.java src\config\*.java src\service\*.java src\frames\*.java
+java -cp "lib/*;bin" src.Main
+```
+
+- `-cp "bin;lib\jcalendar-1.4.jar"` puts `bin` (for previously compiled classes)
+  and the JCalendar jar on the compile classpath, so `JDateChooser` resolves.
+- `-d bin` writes the `.class` files into `bin/`.
+- The `*.java` globs pull in every config, service and frame source.
+- At run time `java -cp "lib/*;bin" src.Main` loads all jars in `lib/` plus the
+  compiled classes in `bin/`.
+
+> The classpath separator on Windows is `;` (semicolon). The quotes around
+> `"lib/*"` are required so the shell passes the wildcard to Java instead of
+> expanding it.
 
 ### Recommended: compile everything with one command
 
@@ -287,7 +356,8 @@ and press **Enter**.
 
 ## Notes
 
-- `.env`, `*.class`, `*.csv` and `dist/` are ignored by git (see `.gitignore`).
-  Commit `env.txt` as a template; keep real credentials in `.env`.
+- `.env`, `*.class`, `*.csv`, `constants.txt` and `dist/` are ignored by git
+  (see `.gitignore`). Commit `env.txt` as a template; keep real credentials in
+  `.env`.
 - CSV parsing is intentionally simple (`String.split(",")`), so **avoid commas
   inside field values** (use underscores, e.g. `Francesc_Miralles`).
