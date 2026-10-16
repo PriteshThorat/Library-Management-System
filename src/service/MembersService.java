@@ -11,12 +11,6 @@ import javax.swing.JOptionPane;
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
-class MemberIDAlreadyExistsException extends Exception {
-  MemberIDAlreadyExistsException () {
-    super("Member ID already exists.");
-  }
-}
-
 class PleaseFillInAllFieldsException extends Exception {
   PleaseFillInAllFieldsException () {
     super("Please fill in all fields.");

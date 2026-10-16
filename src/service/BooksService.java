@@ -11,12 +11,6 @@ import javax.swing.JOptionPane;
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
-class BookIDAlreadyExistsException extends Exception {
-  BookIDAlreadyExistsException () {
-    super("Book ID already exists.");
-  }
-}
-
 class QuantityCannotBeNegativeException extends Exception {
   QuantityCannotBeNegativeException () {
     super("Quantity cannot be negative.");

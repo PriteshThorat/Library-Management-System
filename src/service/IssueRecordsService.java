@@ -11,12 +11,6 @@ import java.util.Scanner;
 import src.config.ConstantsConfig;
 import src.config.EnvConfig;
 
-class IssueIDAlreadyExistsException extends Exception {
-  IssueIDAlreadyExistsException () {
-    super("Issue ID already exists.");
-  }
-}
-
 class PleaseFillInAllFieldsException extends Exception {
   PleaseFillInAllFieldsException () {
     super("Please fill in all fields.");
