@@ -138,9 +138,7 @@ public class MemberFrame extends JFrame {
         searchField.setBackground(FIELD_BG);
         searchField.setCaretColor(TEXT);
         searchField.setPreferredSize(new Dimension(220, 38));
-        searchField.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedLineBorder(BORDER, 8, 1),
-                new EmptyBorder(6, 12, 6, 12)));
+        searchField.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
 
         JButton searchButton = new RoundedButton("Search", BLUE);
         JButton showAllButton = new RoundedButton("Show All", GRAY);

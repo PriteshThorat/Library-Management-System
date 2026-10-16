@@ -121,112 +121,110 @@ public class BookFrame {
   }
 
   private JPanel createTableCard() {
-      RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
-      card.setLayout(new BorderLayout(0, 16));
-      card.setBorder(new EmptyBorder(24, 28, 24, 28));
+    RoundedPanel card = new RoundedPanel(16, Color.WHITE, BORDER);
+    card.setLayout(new BorderLayout(0, 16));
+    card.setBorder(new EmptyBorder(24, 28, 24, 28));
 
-      JPanel top = new JPanel(new BorderLayout());
-      top.setOpaque(false);
+    JPanel top = new JPanel(new BorderLayout());
+    top.setOpaque(false);
 
-      JLabel title = new JLabel("Book List");
-      title.setFont(new Font("Arial", Font.BOLD, 18));
-      title.setForeground(TEXT);
-      top.add(title, BorderLayout.WEST);
+    JLabel title = new JLabel("Book List");
+    title.setFont(new Font("Arial", Font.BOLD, 18));
+    title.setForeground(TEXT);
+    top.add(title, BorderLayout.WEST);
 
-      JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
-      searchPanel.setOpaque(false);
+    JPanel searchPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 12, 0));
+    searchPanel.setOpaque(false);
 
-      searchField = new JTextField(20);
-      searchField.setFont(new Font("Arial", Font.PLAIN, 14));
-      searchField.setForeground(TEXT);
-      searchField.setBackground(FIELD_BG);
-      searchField.setCaretColor(TEXT);
-      searchField.setPreferredSize(new Dimension(220, 38));
-      searchField.setBorder(BorderFactory.createCompoundBorder(
-          new RoundedLineBorder(BORDER, 8, 1),
-          new EmptyBorder(6, 12, 6, 12)));
+    searchField = new JTextField(20);
+    searchField.setFont(new Font("Arial", Font.PLAIN, 14));
+    searchField.setForeground(TEXT);
+    searchField.setBackground(FIELD_BG);
+    searchField.setCaretColor(TEXT);
+    searchField.setPreferredSize(new Dimension(220, 38));
+    searchField.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
 
-      JButton searchButton = new RoundedButton("Search", BLUE);
-      JButton showAllButton = new RoundedButton("Show All", GRAY);
+    JButton searchButton = new RoundedButton("Search", BLUE);
+    JButton showAllButton = new RoundedButton("Show All", GRAY);
 
-      JLabel searchLabel = new JLabel("Search:");
-      searchLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-      searchLabel.setForeground(MUTED);
+    JLabel searchLabel = new JLabel("Search:");
+    searchLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+    searchLabel.setForeground(MUTED);
 
-      searchPanel.add(searchLabel);
-      searchPanel.add(searchField);
-      searchPanel.add(searchButton);
-      searchPanel.add(showAllButton);
+    searchPanel.add(searchLabel);
+    searchPanel.add(searchField);
+    searchPanel.add(searchButton);
+    searchPanel.add(showAllButton);
 
-      top.add(searchPanel, BorderLayout.EAST);
-      card.add(top, BorderLayout.NORTH);
+    top.add(searchPanel, BorderLayout.EAST);
+    card.add(top, BorderLayout.NORTH);
 
-      String[] columns = {
-        "Book ID", "Title", "Author", "ISBN", "Quantity"
-      };
+    String[] columns = {
+      "Book ID", "Title", "Author", "ISBN", "Quantity"
+    };
 
-      tableModel = new DefaultTableModel(columns, 0) {
-        @Override
-        public boolean isCellEditable(int row, int column) {
-            return false;
-        }
-      };
+    tableModel = new DefaultTableModel(columns, 0) {
+      @Override
+      public boolean isCellEditable(int row, int column) {
+          return false;
+      }
+    };
 
-      bookTable = new JTable(tableModel);
-      bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-      bookTable.setRowHeight(32);
-      bookTable.setFont(new Font("Arial", Font.PLAIN, 14));
-      bookTable.setForeground(TEXT);
-      bookTable.setGridColor(BORDER);
-      bookTable.setShowVerticalLines(false);
-      bookTable.setIntercellSpacing(new Dimension(0, 0));
-      bookTable.setSelectionBackground(new Color(232, 240, 254));
-      bookTable.setSelectionForeground(TEXT);
-      bookTable.setFocusable(false);
-      bookTable.getTableHeader().setReorderingAllowed(false);
+    bookTable = new JTable(tableModel);
+    bookTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    bookTable.setRowHeight(32);
+    bookTable.setFont(new Font("Arial", Font.PLAIN, 14));
+    bookTable.setForeground(TEXT);
+    bookTable.setGridColor(BORDER);
+    bookTable.setShowVerticalLines(false);
+    bookTable.setIntercellSpacing(new Dimension(0, 0));
+    bookTable.setSelectionBackground(new Color(232, 240, 254));
+    bookTable.setSelectionForeground(TEXT);
+    bookTable.setFocusable(false);
+    bookTable.getTableHeader().setReorderingAllowed(false);
 
-      JTableHeader header = bookTable.getTableHeader();
-      header.setFont(new Font("Arial", Font.BOLD, 13));
-      header.setForeground(MUTED);
-      header.setBackground(new Color(248, 250, 252));
-      header.setPreferredSize(new Dimension(0, 40));
-      header.setBorder(new EmptyBorder(0, 0, 0, 0));
+    JTableHeader header = bookTable.getTableHeader();
+    header.setFont(new Font("Arial", Font.BOLD, 13));
+    header.setForeground(MUTED);
+    header.setBackground(new Color(248, 250, 252));
+    header.setPreferredSize(new Dimension(0, 40));
+    header.setBorder(new EmptyBorder(0, 0, 0, 0));
 
-      JScrollPane scrollPane = new JScrollPane(bookTable);
-      scrollPane.setBorder(BorderFactory.createLineBorder(BORDER));
-      scrollPane.getViewport().setBackground(Color.WHITE);
+    JScrollPane scrollPane = new JScrollPane(bookTable);
+    scrollPane.setBorder(BorderFactory.createLineBorder(BORDER));
+    scrollPane.getViewport().setBackground(Color.WHITE);
 
-      card.add(scrollPane, BorderLayout.CENTER);
+    card.add(scrollPane, BorderLayout.CENTER);
 
-      searchButton.addActionListener(e -> searchBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
-      showAllButton.addActionListener(e -> loadBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
+    searchButton.addActionListener(e -> searchBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
+    showAllButton.addActionListener(e -> loadBooks((JFrame) SwingUtilities.getWindowAncestor(card)));
 
-      bookTable.getSelectionModel().addListSelectionListener(e -> {
-          if (!e.getValueIsAdjusting()) {
-              fillFieldsFromTable();
-          }
-      });
+    bookTable.getSelectionModel().addListSelectionListener(e -> {
+      if (!e.getValueIsAdjusting()) {
+        fillFieldsFromTable();
+      }
+    });
 
-      return card;
+    return card;
   }
 
   private void addField(JPanel form, GridBagConstraints gc, int row, String labelText, JTextField field) {
-      gc.gridx = 0;
-      gc.gridy = row;
-      gc.anchor = GridBagConstraints.EAST;
-      gc.fill = GridBagConstraints.NONE;
-      gc.weightx = 0;
+    gc.gridx = 0;
+    gc.gridy = row;
+    gc.anchor = GridBagConstraints.EAST;
+    gc.fill = GridBagConstraints.NONE;
+    gc.weightx = 0;
 
-      JLabel label = new JLabel(labelText);
-      label.setFont(new Font("Arial", Font.PLAIN, 14));
-      label.setForeground(MUTED);
-      form.add(label, gc);
+    JLabel label = new JLabel(labelText);
+    label.setFont(new Font("Arial", Font.PLAIN, 14));
+    label.setForeground(MUTED);
+    form.add(label, gc);
 
-      gc.gridx = 1;
-      gc.anchor = GridBagConstraints.WEST;
-      gc.fill = GridBagConstraints.HORIZONTAL;
-      gc.weightx = 1;
-      form.add(field, gc);
+    gc.gridx = 1;
+    gc.anchor = GridBagConstraints.WEST;
+    gc.fill = GridBagConstraints.HORIZONTAL;
+    gc.weightx = 1;
+    form.add(field, gc);
   }
 
   private JTextField createField() {

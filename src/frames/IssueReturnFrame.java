@@ -297,14 +297,6 @@ public class IssueReturnFrame extends JFrame {
 
         try {
             if (IssueRecordsService.returnedIssueBook(issueId)) {
-                if (!IssueRecordsService.updateBookQuantityAfterReturn(bookId)) {
-                    showMessage("Return saved, but book quantity could not be updated. "
-                            + "Check books.csv before processing another return.");
-                    loadIssues();
-
-                    return;
-                }
-
                 loadIssues();
                 clearFields();
                 showMessage("Book returned successfully.");
@@ -389,37 +381,6 @@ public class IssueReturnFrame extends JFrame {
                 LocalDate.now().plusDays(14).toString());
         searchField.setText("");
         issueTable.clearSelection();
-    }
-
-    private List<String[]> readCsv(String filePath, int expectedColumns) {
-        List<String[]> records = new ArrayList<>();
-        File file = new File(filePath);
-
-        if (!file.exists()) {
-            return records;
-        }
-
-        try (BufferedReader reader = new BufferedReader(
-                new FileReader(file))) {
-
-            reader.readLine();
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                String[] data = line.split(",", -1);
-
-                if (data.length == expectedColumns) {
-                    records.add(data);
-                }
-            }
-
-        } catch (IOException ex) {
-            showMessage("Error reading " + filePath + ": "
-                    + ex.getMessage());
-        }
-
-        return records;
     }
 
     private void showMessage(String message) {
