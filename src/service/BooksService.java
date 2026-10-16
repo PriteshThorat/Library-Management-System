@@ -15,9 +15,15 @@ class BookIDAlreadyExistsException extends Exception {
   }
 }
 
-class QuantityCannotBeNegative extends Exception {
-  QuantityCannotBeNegative () {
+class QuantityCannotBeNegativeException extends Exception {
+  QuantityCannotBeNegativeException () {
     super("Quantity cannot be negative.");
+  }
+}
+
+class QuantityMustBeAValidIntegerException extends Exception {
+  QuantityMustBeAValidIntegerException () {
+    super("Quantity must be a valid integer");
   }
 }
 
@@ -75,6 +81,16 @@ public class BooksService {
 
   public static boolean writeBooks(String title, String author, String isbn, String quantity) throws Exception {
     FileWriter fileWriter = new FileWriter(EnvConfig.getBooksFilename(), true);
+
+    try {
+      int quantityInInt = Integer.parseInt(quantity);
+
+      if (quantityInInt < 0) {
+        throw new QuantityCannotBeNegativeException();
+      }
+    } catch (NumberFormatException e) {
+      throw new QuantityMustBeAValidIntegerException();
+    }
 
     fileWriter.append(ConstantsConfig.getBookId() + ",");
 
