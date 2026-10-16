@@ -1,5 +1,6 @@
 *.env
 *.class
 *.csv
+*.jar
 constants.txt
 dist

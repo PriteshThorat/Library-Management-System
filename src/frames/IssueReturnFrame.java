@@ -11,10 +11,16 @@ import src.service.IssueRecordsService;
 import java.awt.*;
 import java.awt.geom.RoundRectangle2D;
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import com.toedter.calendar.JDateChooser;
 
 public class IssueReturnFrame extends JFrame {
     private static final Color CONTENT_BG = new Color(245, 247, 250);
@@ -31,8 +37,8 @@ public class IssueReturnFrame extends JFrame {
     private JTextField issueIdField;
     private JTextField bookIdField;
     private JTextField memberIdField;
-    private JTextField issueDateField;
-    private JTextField dueDateField;
+    private JDateChooser issueDateChooser;
+    private JDateChooser dueDateChooser;
     private JTextField searchField;
 
     private JTable issueTable;
@@ -80,10 +86,8 @@ public class IssueReturnFrame extends JFrame {
         issueIdField = createField(ConstantsConfig.getIssueId());
         bookIdField = createField();
         memberIdField = createField();
-        issueDateField = createField();
-        dueDateField = createField();
-        issueDateField.setText(LocalDate.now().toString());
-        dueDateField.setText(LocalDate.now().plusDays(14).toString());
+        issueDateChooser = createDateChooser(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        dueDateChooser = createDateChooser(Date.from(LocalDate.now().plusDays(14).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
         JPanel form = new JPanel(new GridBagLayout());
         form.setOpaque(false);
@@ -91,11 +95,11 @@ public class IssueReturnFrame extends JFrame {
         GridBagConstraints gc = new GridBagConstraints();
         gc.insets = new Insets(8, 6, 8, 6);
 
-        addField(form, gc, 0, "Issue ID:", issueIdField);
-        addField(form, gc, 1, "Book ID:", bookIdField);
-        addField(form, gc, 2, "Member ID:", memberIdField);
-        addField(form, gc, 3, "Issue Date (YYYY-MM-DD):", issueDateField);
-        addField(form, gc, 4, "Due Date (YYYY-MM-DD):", dueDateField);
+        addSpinnerField(form, gc, 0, "Issue ID:", issueIdField);
+        addSpinnerField(form, gc, 1, "Book ID:", bookIdField);
+        addSpinnerField(form, gc, 2, "Member ID:", memberIdField);
+        addSpinnerField(form, gc, 3, "Issue Date:", issueDateChooser);
+        addSpinnerField(form, gc, 4, "Due Date:", dueDateChooser);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT, 12, 0));
         buttons.setOpaque(false);
@@ -216,7 +220,7 @@ public class IssueReturnFrame extends JFrame {
         return card;
     }
 
-    private void addField(JPanel form, GridBagConstraints gc, int row, String labelText, JTextField field) {
+    private void addSpinnerField(JPanel form, GridBagConstraints gc, int row, String labelText, JComponent field) {
         gc.gridx = 0;
         gc.gridy = row;
         gc.anchor = GridBagConstraints.EAST;
@@ -233,6 +237,51 @@ public class IssueReturnFrame extends JFrame {
         gc.fill = GridBagConstraints.HORIZONTAL;
         gc.weightx = 1;
         form.add(field, gc);
+    }
+
+    private JDateChooser createDateChooser(Date date) {
+        JDateChooser chooser = new JDateChooser(date);
+        chooser.setDateFormatString("yyyy-MM-dd");
+        chooser.setFont(new Font("Arial", Font.PLAIN, 14));
+        chooser.setPreferredSize(new Dimension(320, 38));
+        try {
+            java.awt.Component comp = chooser.getDateEditor().getUiComponent();
+            if (comp instanceof JTextField) {
+                JTextField tf = (JTextField) comp;
+                tf.setFont(new Font("Arial", Font.PLAIN, 14));
+                tf.setForeground(TEXT);
+                tf.setBackground(FIELD_BG);
+                tf.setCaretColor(TEXT);
+                tf.setEditable(false);
+                tf.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(6, 12, 6, 12)));
+                tf.addMouseListener(new java.awt.event.MouseAdapter() {
+                    public void mousePressed(java.awt.event.MouseEvent evt) {
+                        chooser.actionPerformed(null);
+                    }
+                });
+            }
+        } catch (Exception e) {
+        }
+        chooser.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(BORDER, 8, 1), new EmptyBorder(0, 12, 0, 12)));
+        chooser.setBackground(FIELD_BG);
+        return chooser;
+    }
+
+    private String getDateFromChooser(JDateChooser chooser) {
+        Date date = chooser.getDate();
+        if (date == null) return "";
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
+
+    private void setDateInChooser(JDateChooser chooser, String dateStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = sdf.parse(dateStr);
+            chooser.setDate(date);
+        } catch (Exception e) {
+            // If parsing fails, don't change the chooser
+        }
     }
 
     private JTextField createField() {
@@ -262,8 +311,8 @@ public class IssueReturnFrame extends JFrame {
     private void issueBook() {
         String bookId = bookIdField.getText().trim();
         String memberId = memberIdField.getText().trim();
-        String issueDate = issueDateField.getText().trim();
-        String dueDate = dueDateField.getText().trim();
+        String issueDate = getDateFromChooser(issueDateChooser);
+        String dueDate = getDateFromChooser(dueDateChooser);
 
         try {
             if (IssueRecordsService.issueBooks(bookId, memberId, issueDate, dueDate)) {
@@ -366,9 +415,9 @@ public class IssueReturnFrame extends JFrame {
                 tableModel.getValueAt(row, 1).toString());
         memberIdField.setText(
                 tableModel.getValueAt(row, 2).toString());
-        issueDateField.setText(
+        setDateInChooser(issueDateChooser,
                 tableModel.getValueAt(row, 3).toString());
-        dueDateField.setText(
+        setDateInChooser(dueDateChooser,
                 tableModel.getValueAt(row, 4).toString());
     }
 
@@ -376,9 +425,8 @@ public class IssueReturnFrame extends JFrame {
         issueIdField.setText("");
         bookIdField.setText("");
         memberIdField.setText("");
-        issueDateField.setText(LocalDate.now().toString());
-        dueDateField.setText(
-                LocalDate.now().plusDays(14).toString());
+        setDateInChooser(issueDateChooser, LocalDate.now().toString());
+        setDateInChooser(dueDateChooser, LocalDate.now().plusDays(14).toString());
         searchField.setText("");
         issueTable.clearSelection();
     }
