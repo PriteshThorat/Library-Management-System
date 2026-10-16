@@ -116,6 +116,18 @@ public class MembersService {
   }
 
   public static boolean updateMember (String memberId, String name, String email, String phone) throws Exception {
+    if (memberId.isEmpty() || name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
+      throw new PleaseFillInAllFieldsException();
+    }
+
+    if (!email.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$")) {
+      throw new PleaseEnterAValidEmailAddressException();
+    }
+
+    if (!phone.matches("\\d{10}")) {
+      throw new PhoneNumberMustContain10DigitsException();
+    }
+
     File file = new File(EnvConfig.getMembersFilename());
 
     Scanner memberData = new Scanner(file);
