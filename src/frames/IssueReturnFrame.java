@@ -503,13 +503,17 @@ public class IssueReturnFrame extends JFrame {
     }
 
     private void clearFields() {
-        issueIdField.setText("");
-        selectById(bookIdCombo, "");
-        selectById(memberIdCombo, "");
-        setDateInChooser(issueDateChooser, LocalDate.now().toString());
-        setDateInChooser(dueDateChooser, LocalDate.now().plusDays(14).toString());
-        searchField.setText("");
-        issueTable.clearSelection();
+        try {
+            issueIdField.setText(ConstantsConfig.getIssueId());
+            selectById(bookIdCombo, "");
+            selectById(memberIdCombo, "");
+            setDateInChooser(issueDateChooser, LocalDate.now().toString());
+            setDateInChooser(dueDateChooser, LocalDate.now().plusDays(14).toString());
+            searchField.setText("");
+            issueTable.clearSelection();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private void showMessage(String message) {

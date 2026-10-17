@@ -347,12 +347,16 @@ public class MemberFrame extends JFrame {
     }
 
     private void clearFields() {
-        memberIdField.setText("");
-        nameField.setText("");
-        emailField.setText("");
-        phoneField.setText("");
-        searchField.setText("");
-        memberTable.clearSelection();
+        try {
+            memberIdField.setText(ConstantsConfig.getMemberId());
+            nameField.setText("");
+            emailField.setText("");
+            phoneField.setText("");
+            searchField.setText("");
+            memberTable.clearSelection();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private void loadMembers() {

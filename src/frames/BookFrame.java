@@ -344,12 +344,16 @@ public class BookFrame {
   }
 
   private void clearFields(JFrame frame) {
-    bookIdField.setText("");
-    titleField.setText("");
-    authorField.setText("");
-    isbnField.setText("");
-    quantityField.setText("");
-    bookTable.clearSelection();
+    try {
+      bookIdField.setText(ConstantsConfig.getBookId());
+      titleField.setText("");
+      authorField.setText("");
+      isbnField.setText("");
+      quantityField.setText("");
+      bookTable.clearSelection();
+    } catch (Exception e) {
+      System.out.println(e);
+    }
   }
 
   private void loadBooks(JFrame frame) {
