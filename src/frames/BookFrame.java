@@ -36,6 +36,7 @@ public class BookFrame {
 
   public BookFrame() {
     JFrame frame = new JFrame("Manage Books");
+    WindowIcon.apply(frame);
     frame.setTitle("Library Management System - Books");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

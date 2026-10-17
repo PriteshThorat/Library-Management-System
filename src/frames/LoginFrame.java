@@ -29,6 +29,7 @@ public class LoginFrame {
 
     public LoginFrame() {
         JFrame frame = new JFrame("Library Management System");
+        WindowIcon.apply(frame);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel content = new JPanel();

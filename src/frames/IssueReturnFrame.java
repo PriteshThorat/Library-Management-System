@@ -47,6 +47,7 @@ public class IssueReturnFrame extends JFrame {
     private DefaultTableModel tableModel;
 
     public IssueReturnFrame() {
+        WindowIcon.apply(this);
         setTitle("Library Management System - Issue / Return");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 

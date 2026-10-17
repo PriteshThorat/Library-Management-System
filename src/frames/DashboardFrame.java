@@ -25,6 +25,7 @@ public class DashboardFrame {
 
     public DashboardFrame() throws Exception {
         frame = new JFrame("Library Management System - Dashboard");
+        WindowIcon.apply(frame);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 

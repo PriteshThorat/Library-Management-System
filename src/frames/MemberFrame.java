@@ -34,6 +34,7 @@ public class MemberFrame extends JFrame {
     private DefaultTableModel tableModel;
 
     public MemberFrame() {
+        WindowIcon.apply(this);
         setTitle("Library Management System - Members");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
